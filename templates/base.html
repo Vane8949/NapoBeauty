@@ -29,12 +29,15 @@
             </div>
 
             <nav class="p-4 space-y-1">
+                 <!-- Nuevo enlace de dashboard -->
                 <a href="{% url 'dashboard' %}" class="menu-item">
                     <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
                 </a>
+                 <!-- Nuevo enlace de productos -->
                 <a href="{% url 'productos' %}" class="menu-item">
                     <i class="fa-solid fa-box w-5 text-center"></i> Productos
                 </a>
+                  <!-- Nuevo enlace de inventario -->
                 <a href="{% url 'inventario' %}" class="menu-item">
                     <i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Inventario
                 </a>
@@ -43,7 +46,10 @@
                     <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Ventas
                 </a>
                 
-                <a href="#" class="menu-item"><i class="fa-solid fa-arrow-rotate-left w-5 text-center"></i> Devoluciones</a>
+                 <!-- Nuevo enlace de Devoluciones -->
+                <a href="{% url 'devoluciones' %}" class="menu-item">
+                 <i class="fa-solid fa-arrow-rotate-left w-5 text-center"></i> Devoluciones
+                </a>
                 <a href="#" class="menu-item"><i class="fa-regular fa-user w-5 text-center"></i> Clientes</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-truck-fast w-5 text-center"></i> Proveedores</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-chart-column w-5 text-center"></i> Reportes</a>
