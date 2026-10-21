@@ -1,9 +1,10 @@
 from django.urls import path
-from .Rutas import dashboard, productos, inventario, ventas
+from .Rutas import dashboard, productos, inventario, ventas, devoluciones
 
 urlpatterns = [
     path('', dashboard.panel_principal, name='dashboard'),
     path('productos/', productos.panel_productos, name='productos'),
     path('inventario/', inventario.panel_inventario, name='inventario'),
     path('ventas/', ventas.panel_ventas, name='ventas'),
+    path('devoluciones/', devoluciones.panel_devoluciones, name='devoluciones'),
 ]
