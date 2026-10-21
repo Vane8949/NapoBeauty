@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- CSS exclusivo de Ventas -->
+<link rel="stylesheet" href="{% static 'css/ventas.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+    <div class="flex-1">
+        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Ventas</h1>
+        <p class="text-gray-600 text-sm">Gestiona y monitorea las ventas, pedidos y transacciones</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex flex-col gap-2">
+            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Registrar Venta</button>
+            <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-download"></i> Exportar Historial</button>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
+        <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-money-bill-wave"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Total Ventas de Hoy</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">C$ 12,450.00</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
+        <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Pedidos del Mes</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">248 Pedidos</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
+        <div class="tarjeta-icono bg-[#FBCFE8] text-[#BE185D]"><i class="fa-solid fa-arrow-trend-up"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Ventas Mensuales</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">C$ 184,320.00</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
+        <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-ticket"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Ticket Promedio</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">C$ 743.00</h2>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="tabla-napo">
+            <thead>
+                <tr>
+                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
+                    <th>ID Venta</th>
+                    <th>Cliente</th>
+                    <th>Fecha y Hora</th>
+                    <th>Método de Pago</th>
+                    <th>Total</th>
+                    <th>Estado de Venta</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#V-1024</td>
+                    <td><p class="font-bold text-gray-800">Ana Garvie</p><p class="text-xs text-gray-500">anagarvie@gmail.com</p></td>
+                    <td>17/04/2025 10:15 am</td>
+                    <td><span class="badge-pago"><i class="fa-solid fa-money-bill-transfer"></i> Transferencia</span></td>
+                    <td class="font-bold text-gray-900">C$ 820.00</td>
+                    <td><span class="badge badge-exito">Completada</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#V-1022</td>
+                    <td><p class="font-bold text-gray-800">Daniela Pérez</p><p class="text-xs text-gray-500">danielaperez@gmail.com</p></td>
+                    <td>17/04/2025 10:15 am</td>
+                    <td><span class="badge-pago"><i class="fa-solid fa-credit-card"></i> Tarjeta</span></td>
+                    <td class="font-bold text-gray-900">C$ 1,240.00</td>
+                    <td><span class="badge badge-pendiente">Pendiente de Pago</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
