@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Encabezado y Fecha -->
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+    <div class="flex-1">
+        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Inventario</h1>
+        <p class="text-gray-600 text-sm">Controla el stock, variaciones, ubicaciones y movimientos de mercancía</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <!-- Botones de Acción -->
+        <div class="flex gap-3">
+            <button class="bg-napo-text hover:bg-pink-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Ajustar Stock
+            </button>
+            <button class="bg-[#F472B6] hover:bg-pink-500 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition flex items-center gap-2">
+                Movimientos
+            </button>
+        </div>
+
+        <!-- Tarjetas de Fecha y Hora -->
+        <div class="flex gap-4">
+            <div class="bg-napo-bg rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
+                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
+                </div>
+            </div>
+            <div class="bg-napo-bg rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-32">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-clock"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hora</p>
+                    <p class="text-xs font-bold text-gray-800">10:32 a. m.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de Indicadores (KPIs) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
+        <div class="w-12 h-12 bg-[#FCE7F3] text-[#EC4899] rounded-full flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-box-open"></i></div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium mb-0.5">Total de Stock</p>
+            <h2 class="text-2xl font-extrabold text-gray-800">2,845</h2>
+        </div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
+        <div class="w-12 h-12 bg-[#FEE2E2] text-[#EF4444] rounded-full flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium mb-0.5">Bajo Stock / Alertas</p>
+            <h2 class="text-2xl font-extrabold text-gray-800">14</h2>
+        </div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
+        <div class="w-12 h-12 bg-[#FEF3C7] text-[#F59E0B] rounded-full flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium mb-0.5">Próximos a Caducar</p>
+            <h2 class="text-2xl font-extrabold text-gray-800">11</h2>
+        </div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5">
+        <div class="w-12 h-12 bg-[#FEF3C7] text-[#D97706] rounded-full flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-coins"></i></div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium mb-0.5">Valor del Inventario</p>
+            <h2 class="text-2xl font-extrabold text-gray-800">C$ 342,150.00</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor Principal de la Tabla -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    
+    <!-- Barra de Filtros -->
+    <div class="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <div class="relative w-full lg:w-1/3">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-2.5 text-gray-400"></i>
+            <input type="text" placeholder="Buscar productos, movimientos o SKU..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-300 focus:ring-1 focus:ring-pink-300 text-sm">
+        </div>
+        <div class="w-full lg:w-auto flex flex-wrap gap-3">
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 min-w-[130px]">
+                <option>Categoría</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 min-w-[130px]">
+                <option>Ubicación</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 min-w-[130px]">
+                <option>Estado</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 min-w-[130px]">
+                <option>Ordenar por</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabla de Inventario -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-napo-bg text-gray-700 font-bold border-b border-pink-100">
+                <tr>
+                    <th class="p-4 w-12 text-center"><input type="checkbox" class="rounded text-napo-primary focus:ring-pink-200 w-4 h-4 accent-pink-500"></th>
+                    <th class="p-4">Imagen</th>
+                    <th class="p-4">Producto / SKU</th>
+                    <th class="p-4">Categoría</th>
+                    <th class="p-4">Ubicación</th>
+                    <th class="p-4">Variante / Tono</th>
+                    <th class="p-4">Stock Inicial</th>
+                    <th class="p-4">Stock Actual</th>
+                    <th class="p-4">Fecha de Caducidad</th>
+                    <th class="p-4">Estado</th>
+                    <th class="p-4 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700">
+                
+                <!-- Fila 1 -->
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="p-4 text-center"><input type="checkbox" class="rounded text-napo-primary w-4 h-4 accent-pink-500"></td>
+                    <td class="p-4"><div class="w-10 h-10 bg-gray-100 rounded-lg border border-gray-200"></div></td>
+                    <td class="p-4"><p class="font-bold text-gray-800">Labial Velvet Matte</p><p class="text-xs text-gray-500">SKU: NAP-001</p></td>
+                    <td class="p-4">Labios</td>
+                    <td class="p-4">Almacén Principal</td>
+                    <td class="p-4"><span class="bg-[#E0E7FF] text-[#4338CA] text-[11px] px-3 py-1 rounded-full font-bold">4 Tonos</span></td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-700 text-[11px] px-3 py-1 rounded-full font-bold">100</span></td>
+                    <td class="p-4"><span class="bg-[#D1FAE5] text-[#047857] text-[11px] px-3 py-1 rounded-full font-bold">50 (En stock)</span></td>
+                    <td class="p-4">13/11/2027</td>
+                    <td class="p-4"><span class="bg-[#D1FAE5] text-[#047857] text-[11px] px-3 py-1 rounded-full font-bold">Óptimo</span></td>
+                    <td class="p-4 text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary transition"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary transition"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500 transition"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Fila 2 -->
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="p-4 text-center"><input type="checkbox" class="rounded text-napo-primary w-4 h-4 accent-pink-500"></td>
+                    <td class="p-4"><div class="w-10 h-10 bg-gray-100 rounded-lg border border-gray-200"></div></td>
+                    <td class="p-4"><p class="font-bold text-gray-800">Paleta de Sombras Mia</p><p class="text-xs text-gray-500">SKU: NAP-055</p></td>
+                    <td class="p-4">Ojos</td>
+                    <td class="p-4">Tienda física</td>
+                    <td class="p-4"><span class="bg-[#E0E7FF] text-[#4338CA] text-[11px] px-3 py-1 rounded-full font-bold">2 Tamaños</span></td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-700 text-[11px] px-3 py-1 rounded-full font-bold">50</span></td>
+                    <td class="p-4"><span class="bg-[#FEE2E2] text-[#B91C1C] text-[11px] px-3 py-1 rounded-full font-bold">3 (Bajo stock)</span></td>
+                    <td class="p-4">13/11/2027</td>
+                    <td class="p-4"><span class="bg-[#FEE2E2] text-[#B91C1C] text-[11px] px-3 py-1 rounded-full font-bold">Alerta</span></td>
+                    <td class="p-4 text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary transition"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary transition"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500 transition"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Fila 3 -->
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="p-4 text-center"><input type="checkbox" class="rounded text-napo-primary w-4 h-4 accent-pink-500"></td>
+                    <td class="p-4"><div class="w-10 h-10 bg-gray-100 rounded-lg border border-gray-200"></div></td>
+                    <td class="p-4"><p class="font-bold text-gray-800">Crema hidratante</p><p class="text-xs text-gray-500">SKU: NAP-083</p></td>
+                    <td class="p-4">Rostro</td>
+                    <td class="p-4">Almacén Principal</td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold border border-gray-200">Sin variante</span></td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-700 text-[11px] px-3 py-1 rounded-full font-bold">80</span></td>
+                    <td class="p-4"><span class="bg-[#FEF3C7] text-[#B45309] text-[11px] px-3 py-1 rounded-full font-bold">12 (Por stock)</span></td>
+                    <td class="p-4">27/04/2025</td>
+                    <td class="p-4"><span class="bg-[#FEF3C7] text-[#B45309] text-[11px] px-3 py-1 rounded-full font-bold">Próximo a caducar</span></td>
+                    <td class="p-4 text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary transition"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary transition"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500 transition"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Fila 4 -->
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="p-4 text-center"><input type="checkbox" class="rounded text-napo-primary w-4 h-4 accent-pink-500"></td>
+                    <td class="p-4"><div class="w-10 h-10 bg-gray-100 rounded-lg border border-gray-200"></div></td>
+                    <td class="p-4"><p class="font-bold text-gray-800">Máscara de pestañas</p><p class="text-xs text-gray-500">SKU: NAP-102</p></td>
+                    <td class="p-4">Ojos</td>
+                    <td class="p-4">Almacén Principal</td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold border border-gray-200">Sin variante</span></td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-700 text-[11px] px-3 py-1 rounded-full font-bold">80</span></td>
+                    <td class="p-4"><span class="bg-[#FEF3C7] text-[#B45309] text-[11px] px-3 py-1 rounded-full font-bold">12 (Por agotarse)</span></td>
+                    <td class="p-4">27/04/2025</td>
+                    <td class="p-4"><span class="bg-[#FEF3C7] text-[#B45309] text-[11px] px-3 py-1 rounded-full font-bold">Próximo a caducar</span></td>
+                    <td class="p-4 text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary transition"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary transition"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500 transition"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Fila 5 -->
+                <tr class="hover:bg-gray-50 transition opacity-70">
+                    <td class="p-4 text-center"><input type="checkbox" class="rounded text-napo-primary w-4 h-4 accent-pink-500"></td>
+                    <td class="p-4"><div class="w-10 h-10 bg-gray-100 rounded-lg border border-gray-200"></div></td>
+                    <td class="p-4"><p class="font-bold text-gray-800">Máscara de pestañas</p><p class="text-xs text-gray-500">SKU: NAP-162</p></td>
+                    <td class="p-4">Ojos</td>
+                    <td class="p-4">Almacén Principal</td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold border border-gray-200">Sin variante</span></td>
+                    <td class="p-4"><span class="bg-gray-100 text-gray-700 text-[11px] px-3 py-1 rounded-full font-bold">40</span></td>
+                    <td class="p-4"><span class="bg-gray-200 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold">0 (Agotado)</span></td>
+                    <td class="p-4">14/05/2026</td>
+                    <td class="p-4"><span class="bg-gray-200 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold">Sin Stock</span></td>
+                    <td class="p-4 text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary transition"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary transition"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500 transition"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="p-5 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between text-sm text-gray-600">
+        <p>Mostrando 1-10 de 254 productos</p>
+        <div class="flex items-center gap-1 mt-4 md:mt-0">
+            <button class="px-3 py-1.5 border border-transparent text-gray-400 hover:text-gray-800 flex items-center gap-1"><i class="fa-solid fa-chevron-left text-xs"></i> Anterior</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded bg-[#F472B6] text-white font-bold shadow-sm">1</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 border border-transparent">2</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 border border-transparent">3</button>
+            <span class="w-8 h-8 flex items-center justify-center text-gray-400">...</span>
+            <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-600 border border-transparent">26</button>
+            <button class="px-3 py-1.5 border border-transparent hover:bg-gray-50 rounded text-gray-800 font-medium flex items-center gap-1">Siguiente <i class="fa-solid fa-chevron-right text-xs"></i></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
