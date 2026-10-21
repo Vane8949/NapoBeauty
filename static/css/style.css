@@ -1,0 +1,37 @@
+/* Definición de colores globales de Napo Beauty */
+:root {
+    --napo-bg: #FFF0F5;
+    --napo-light: #FFD1DC;
+    --napo-primary: #FF69B4;
+    --napo-text: #D81B60;
+}
+
+/* Tipografía y fondo general */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+}
+
+/* Personalización de la barra de desplazamiento (Scrollbar) para que se vea elegante */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #FFD1DC;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #FF69B4;
+}
+
+/* Transiciones suaves para todos los botones */
+button, a {
+    transition: all 0.3s ease;
+}
