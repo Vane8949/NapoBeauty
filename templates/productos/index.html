@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<!-- CSS exclusivo de Productos -->
+<link rel="stylesheet" href="{% static 'css/productos.css' %}">
+{% endblock %}
+
 {% block content %}
-<!-- Encabezado y Fecha -->
 <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
     <div class="flex-1">
         <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Productos</h1>
@@ -10,29 +14,13 @@
     </div>
     
     <div class="flex flex-col sm:flex-row items-center gap-4">
-        <!-- Uso de la clase CSS limpia: btn-primario -->
         <div class="flex gap-3">
-            <button class="btn-primario">
-                <i class="fa-solid fa-plus"></i> Agregar Producto
-            </button>
-            <button class="btn-primario">
-                Importar/Exportar
-            </button>
-        </div>
-
-        <div class="flex gap-4">
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
-                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
-                <div>
-                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
-                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
-                </div>
-            </div>
+            <button class="btn-primario"><i class="fa-solid fa-plus"></i> Agregar Producto</button>
+            <button class="btn-primario">Importar/Exportar</button>
         </div>
     </div>
 </div>
 
-<!-- Tarjetas de Indicadores (KPIs) usando clase: tarjeta-kpi -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <div class="tarjeta-kpi">
         <div class="tarjeta-icono bg-pink-100 text-napo-primary"><i class="fa-solid fa-box-open"></i></div>
@@ -64,7 +52,6 @@
     </div>
 </div>
 
-<!-- Tabla usando clases CSS: tabla-napo y badge -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="tabla-napo">
@@ -88,19 +75,6 @@
                     <td><span class="badge badge-neutro bg-blue-100 text-blue-700">4 Tonos</span></td>
                     <td class="font-bold">C$ 180.00</td>
                     <td><span class="badge badge-exito">50 (En stock)</span></td>
-                    <td><span class="badge badge-exito">Activo</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td><p class="font-bold text-gray-800">Paleta de Sombras Mia</p><p class="text-xs text-gray-500">SKU: NAP-055</p></td>
-                    <td>Ojos</td>
-                    <td><span class="badge badge-neutro bg-blue-100 text-blue-700">2 Tamaños</span></td>
-                    <td class="font-bold">C$ 350.00</td>
-                    <td><span class="badge badge-alerta">3 (Bajo stock)</span></td>
                     <td><span class="badge badge-exito">Activo</span></td>
                     <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
                         <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
