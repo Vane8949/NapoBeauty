@@ -1,37 +1,154 @@
-/* Definición de colores globales de Napo Beauty */
+
 :root {
-    --napo-bg: #FFF0F5;
-    --napo-light: #FFD1DC;
-    --napo-primary: #FF69B4;
-    --napo-text: #D81B60;
+    --napo-bg-principal: #f9fafb;
+    --napo-menu-lateral: #FFF0F5;
+    --napo-rosado-claro: #FFD1DC;
+    --napo-rosado-fuerte: #FF69B4;
+    --napo-texto-oscuro: #D81B60;
+    --napo-blanco: #ffffff;
+    --napo-gris-texto: #4b5563;
+    --napo-borde: #f3f4f6;
 }
 
-/* Tipografía y fondo general */
+/* --- 2. CONFIGURACIÓN BASE Y SCROLLBAR --- */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f9fafb;
+    background-color: var(--napo-bg-principal);
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--napo-gris-texto);
 }
 
-/* Personalización de la barra de desplazamiento (Scrollbar) para que se vea elegante */
+/* Personalización elegante de la barra de desplazamiento */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
-
 ::-webkit-scrollbar-track {
     background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-    background: #FFD1DC;
+    background-color: var(--napo-rosado-claro);
     border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-    background: #FF69B4;
+    background-color: var(--napo-rosado-fuerte);
 }
 
-/* Transiciones suaves para todos los botones */
-button, a {
+/* --- 3. COMPONENTES: BOTONES --- */
+
+.btn-primario {
+    background-color: var(--napo-rosado-fuerte);
+    color: var(--napo-blanco);
+    padding: 0.75rem 1.25rem; /* 12px 20px */
+    border-radius: 0.5rem;    /* 8px */
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primario:hover {
+    background-color: #f43f5e; /* Un tono más oscuro al pasar el mouse */
+    transform: translateY(-1px); /* Pequeño efecto de elevación */
+}
+
+/* --- 4. COMPONENTES: TARJETAS (Cards de Indicadores) --- */
+.tarjeta-kpi {
+    background-color: var(--napo-blanco);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--napo-borde);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: box-shadow 0.3s ease;
+}
+
+.tarjeta-kpi:hover {
+    box-shadow: 0 4px 6px rgba(255, 105, 180, 0.1); /* Sombra rosada sutil */
+}
+
+.tarjeta-icono {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+/* --- 5. COMPONENTES: TABLAS --- */
+.tabla-napo {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-napo th {
+    background-color: var(--napo-menu-lateral);
+    color: #374151;
+    font-weight: bold;
+    padding: 1rem;
+    border-bottom: 2px solid var(--napo-rosado-claro);
+}
+
+.tabla-napo td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--napo-borde);
+    transition: background-color 0.2s ease;
+}
+
+.tabla-napo tr:hover td {
+    background-color: #fdf2f8; /* Efecto hover en las filas */
+}
+
+/* --- 6. ESTADOS Y PÍLDORAS (Badges de Stock) --- */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px; /* Forma de píldora redonda */
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.badge-exito {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.badge-alerta {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.badge-neutro {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+/* --- 7. COMPONENTES: MENÚ LATERAL --- */
+/* Explicación: Centralizamos el diseño de los enlaces de navegación. 
+   Usamos .activo para resaltar en qué pantalla está el usuario. */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: var(--napo-gris-texto);
+    border-radius: 0.75rem;
     transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.menu-item:hover {
+    background-color: #fce7f3; /* Fondo rosado sutil al pasar el mouse */
+}
+
+.menu-item.activo {
+    background-color: var(--napo-rosado-claro);
+    color: var(--napo-texto-oscuro);
+    font-weight: bold;
 }
