@@ -1,0 +1,51 @@
+/* ==========================================================================
+   MÓDULO: REPORTES
+   Estilos para analíticas y visualización de datos
+   ========================================================================== */
+
+.btn-oscuro {
+    background-color: #831843;
+    color: var(--napo-blanco);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-oscuro:hover { background-color: #9d174d; }
+
+.btn-secundario {
+    background-color: var(--napo-rosado-claro);
+    color: var(--napo-texto-oscuro);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-secundario:hover { background-color: #fbcfe8; }
+
+/* Formatos de reporte en tabla (PDF / Excel) */
+.badge-pdf {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem;
+}
+
+.badge-excel {
+    background-color: #d1fae5;
+    color: #047857;
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem;
+}
