@@ -1,0 +1,62 @@
+/* ==========================================================================
+   MÓDULO: USUARIOS
+   Estilos para la gestión de perfiles, roles y accesos
+   ========================================================================== */
+
+/* Botones superiores */
+.btn-oscuro {
+    background-color: #831843;
+    color: var(--napo-blanco);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-oscuro:hover { background-color: #9d174d; }
+
+.btn-secundario {
+    background-color: var(--napo-rosado-claro);
+    color: var(--napo-texto-oscuro);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-secundario:hover { background-color: #fbcfe8; }
+
+/* --- Píldoras de Roles --- */
+.badge-rol-admin {
+    background-color: #e9d5ff; /* Morado claro */
+    color: #6b21a8;            /* Morado oscuro */
+}
+
+.badge-rol-inventario {
+    background-color: #bfdbfe; /* Azul claro */
+    color: #1e40af;            /* Azul oscuro */
+}
+
+.badge-rol-vendedor {
+    background-color: #fed7aa; /* Naranja claro */
+    color: #9a3412;            /* Naranja oscuro */
+}
+
+/* --- Píldoras de Módulos de Acceso --- */
+.badge-acceso-total {
+    background-color: #9333ea; /* Morado fuerte */
+    color: var(--napo-blanco);
+}
+
+.badge-acceso-parcial {
+    background-color: #be185d; /* Rosado/Vino fuerte */
+    color: var(--napo-blanco);
+}
