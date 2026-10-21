@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- CSS exclusivo de Proveedores -->
+<link rel="stylesheet" href="{% static 'css/proveedores.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Fecha -->
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+    <div class="flex-1">
+        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Proveedores</h1>
+        <p class="text-gray-600 text-sm">Administra, añade y edita el directorio de proveedores y compras de Napo Beauty</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex flex-col gap-2">
+            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Registrar Proveedor</button>
+            <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-download"></i> Historial de Compras</button>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
+                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-clock"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hora</p>
+                    <p class="text-xs font-bold text-gray-800">10:32 a. m.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de Indicadores (KPIs) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
+        <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-box"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Total de Proveedores</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">42</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +5% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
+        <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-solid fa-user-check"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Proveedores Activos</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">38</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +3% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
+        <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Órdenes de Compra Pendientes</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">6</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FFEDD5] border-[#FDBA74]">
+        <div class="tarjeta-icono bg-[#FDBA74] text-[#C2410C]"><i class="fa-solid fa-coins"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Inversión del Mes</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">C$ 84,250.00</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +12% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Proveedores -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    
+    <!-- Filtros -->
+    <div class="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <div class="relative w-full lg:w-1/3">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-2.5 text-gray-400"></i>
+            <input type="text" placeholder="Buscar por proveedor, contacto o marca..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-300 focus:ring-1 focus:ring-pink-300 text-sm">
+        </div>
+        <div class="w-full lg:w-auto flex flex-wrap gap-3">
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>Estado</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>Categoría de Productos</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>País/Origen</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>Ordenar por</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Contenido de Tabla -->
+    <div class="overflow-x-auto">
+        <table class="tabla-napo">
+            <thead>
+                <tr>
+                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
+                    <th>ID Proveedor</th>
+                    <th>Proveedor / Marca</th>
+                    <th>Nombre de Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Categoría</th>
+                    <th>Órdenes Pendientes</th>
+                    <th>Total Comprado</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#PROV01</td>
+                    <td><p class="font-bold text-gray-800">Cosméticos del Pacífico</p><p class="text-xs text-gray-500">Distribuidora / Marcas aliadas</p></td>
+                    <td><p class="font-bold text-gray-800">Carlos Mendoza</p><p class="text-xs text-gray-500">carlos.m@...</p></td>
+                    <td>+505 8888-9999</td>
+                    <td>Maquillaje</td>
+                    <td>0</td>
+                    <td class="font-bold text-gray-900">C$ 45,200.00</td>
+                    <td><span class="badge-activo">Activo</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#PROV02</td>
+                    <td><p class="font-bold text-gray-800">Buxom Nicaragua</p><p class="text-xs text-gray-500">Importados</p></td>
+                    <td><p class="font-bold text-gray-800">Sofía Ortega</p><p class="text-xs text-gray-500">sofia@...</p></td>
+                    <td>+505 8777-6666</td>
+                    <td>Cuidado Facial</td>
+                    <td><span class="badge-alerta-amarilla">2 Pendientes</span></td>
+                    <td class="font-bold text-gray-900">C$ 12,400.00</td>
+                    <td><span class="badge-activo">Activo</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#PROV03</td>
+                    <td><p class="font-bold text-gray-800">Envolturas y Más</p><p class="text-xs text-gray-500">Proveedor local</p></td>
+                    <td><p class="font-bold text-gray-800">Marta Ruiz</p><p class="text-xs text-gray-500">marta.r@...</p></td>
+                    <td>+505 8777-6666</td>
+                    <td>Empaques</td>
+                    <td><span class="badge-alerta-amarilla">1 Pendiente</span></td>
+                    <td class="font-bold text-gray-900">C$ 12,400.00</td>
+                    <td><span class="badge-activo">Activo</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#PROV05</td>
+                    <td><p class="font-bold text-gray-800">Distribuidora Bella</p><p class="text-xs text-gray-500">Mayorista Marcas aliadas</p></td>
+                    <td><p class="font-bold text-gray-800">Marta Ruiz</p><p class="text-xs text-gray-500">marta.r@...</p></td>
+                    <td>+505 8777-6666</td>
+                    <td>Accesorios</td>
+                    <td>0</td>
+                    <td class="font-bold text-gray-900">C$ 8,150.00</td>
+                    <td><span class="badge-inactivo">Inactivo</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
