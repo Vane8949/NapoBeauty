@@ -1,0 +1,27 @@
+/* ==========================================================================
+   MÓDULO: INVENTARIO
+   Estilos específicos para la gestión de stock y ubicaciones
+   ========================================================================== */
+
+/* Píldora para alertas de productos a punto de vencerse */
+.badge-advertencia {
+    background-color: #fef3c7; /* Naranja/Amarillo claro */
+    color: #b45309;            /* Texto naranja oscuro */
+    border: 1px solid #fde68a;
+}
+
+/* Píldora para indicar stock en cero (Agotado) */
+.badge-agotado {
+    background-color: #e5e7eb;
+    color: #374151;
+    font-weight: 800;
+}
+
+/* Estilo para la columna de ubicación (Almacén / Tienda Física) */
+.texto-ubicacion {
+    font-weight: 500;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
