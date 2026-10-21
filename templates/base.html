@@ -50,9 +50,21 @@
                 <a href="{% url 'devoluciones' %}" class="menu-item">
                  <i class="fa-solid fa-arrow-rotate-left w-5 text-center"></i> Devoluciones
                 </a>
-                <a href="#" class="menu-item"><i class="fa-regular fa-user w-5 text-center"></i> Clientes</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-truck-fast w-5 text-center"></i> Proveedores</a>
-                <a href="#" class="menu-item"><i class="fa-solid fa-chart-column w-5 text-center"></i> Reportes</a>
+                
+                 <!-- Nuevo enlace de Clientes -->
+                <a href="{% url 'clientes' %}" class="menu-item">
+                    <i class="fa-regular fa-user w-5 text-center"></i> Clientes
+                </a>
+                 <!-- Nuevo enlace de proveedores -->
+                <a href="{% url 'proveedores' %}" class="menu-item">
+                   <i class="fa-solid fa-truck-fast w-5 text-center"></i> Proveedores
+                </a>
+                    
+                 <!-- Nuevo enlace de reportes -->
+                <a href="{% url 'reportes' %}" class="menu-item">
+                  <i class="fa-solid fa-chart-column w-5 text-center"></i> Reportes
+                </a>
+                 <!-- Nuevo enlace de usuarios -->
                 <a href="#" class="menu-item"><i class="fa-solid fa-users w-5 text-center"></i> Usuarios</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-gear w-5 text-center"></i> Configuración</a>
             </nav>
