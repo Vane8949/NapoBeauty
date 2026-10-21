@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- CSS exclusivo de Reportes -->
+<link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Fecha -->
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+    <div class="flex-1">
+        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Reportes</h1>
+        <p class="text-gray-600 text-sm">Analiza el rendimiento financiero, rotación de inventario y estadísticas de Napo Beauty</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex flex-col gap-2">
+            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Generar Reporte</button>
+            <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-download"></i> Exportar PDF / Excel</button>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
+                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-clock"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hora</p>
+                    <p class="text-xs font-bold text-gray-800">10:32 a. m.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de Indicadores (KPIs) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
+        <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Ingresos Brutos (Mes)</p>
+            <h2 class="text-xl font-extrabold text-gray-900">C$ 184,320.00</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +15% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
+        <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-solid fa-wallet"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Ganancia Neta</p>
+            <h2 class="text-xl font-extrabold text-gray-900">C$ 72,450.00</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +18% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
+        <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Costo de Inventario Vendido</p>
+            <h2 class="text-xl font-extrabold text-gray-900">C$ 111,870.00</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FEE2E2] border-[#FCA5A5]">
+        <div class="tarjeta-icono bg-[#FCA5A5] text-[#B91C1C]"><i class="fa-solid fa-rotate-left"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Tasa de Devolución</p>
+            <h2 class="text-xl font-extrabold text-gray-900">2.4%</h2>
+            <p class="text-[10px] text-red-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-down"></i> -0.5% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros de Reporte -->
+<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-wrap gap-4 items-center justify-between">
+    <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 flex-1 min-w-[200px]">
+        <option>Tipo de Reporte</option>
+    </select>
+    <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 flex-1 min-w-[200px]">
+        <option>Rango de Fechas (Este Mes)</option>
+    </select>
+    <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 flex-1 min-w-[200px]">
+        <option>Categoría</option>
+    </select>
+    <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300 flex-1 min-w-[200px]">
+        <option>Formato</option>
+    </select>
+</div>
+
+<!-- Sección de Gráficos -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+        <h3 class="font-bold text-gray-800 mb-4">Ingresos vs. Costos (Últimos 6 Meses)</h3>
+        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-400">
+            <canvas id="graficoIngresosCostos"></canvas>
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <h3 class="font-bold text-gray-800 mb-4">Ventas por Categoría</h3>
+        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-400">
+            <canvas id="graficoCategorias"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Historial de Reportes Generados -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="font-bold text-gray-800">Historial de Reportes Generados</h3>
+        <a href="#" class="text-xs text-napo-text font-bold hover:underline">Ver todos</a>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="tabla-napo">
+            <thead>
+                <tr>
+                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
+                    <th>ID Reporte</th>
+                    <th>Nombre del Reporte</th>
+                    <th>Fecha de Generación</th>
+                    <th>Tipo/Módulo</th>
+                    <th>Formato</th>
+                    <th>Generado por</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#REP-001</td>
+                    <td class="font-bold text-gray-800">Cierre de Ventas Mensual</td>
+                    <td>31/03/2025 10:15 am</td>
+                    <td>Finanzas</td>
+                    <td><span class="badge-pdf">[ PDF ]</span></td>
+                    <td>Administrador</td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="font-bold text-gray-600">#REP-002</td>
+                    <td class="font-bold text-gray-800">Inventario Próximo a Caducar</td>
+                    <td>25/03/2025 04:30 pm</td>
+                    <td>Inventario</td>
+                    <td><span class="badge-excel">[ Excel ]</span></td>
+                    <td>Administrador</td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
