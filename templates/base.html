@@ -6,20 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración | Napo Beauty</title>
     
-    <!-- 1. Archivo CSS Propio (Aquí vive el diseño) -->
+    <!-- CSS Global (Colores, menú y scrollbar) -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
-    <!-- 2. Librerías Externas -->
+    <!-- BLOQUE PARA CSS ESPECÍFICO DE CADA PANTALLA -->
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Librerías Externas -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- 3. Archivo JS Propio (Configuración) -->
     <script src="{% static 'js/config.js' %}"></script>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800">
 
-    <!-- Sidebar Izquierdo -->
     <aside class="w-64 bg-napo-bg border-r border-pink-200 flex flex-col justify-between h-full shrink-0">
         <div class="overflow-y-auto flex-1">
             <div class="h-40 flex items-center justify-center border-b border-pink-200">
@@ -28,9 +28,8 @@
                 </div>
             </div>
 
-            <!-- Menú Limpio usando las nuevas clases CSS -->
             <nav class="p-4 space-y-1">
-                <a href="{% url 'dashboard' %}" class="menu-item activo">
+                <a href="{% url 'dashboard' %}" class="menu-item">
                     <i class="fa-solid fa-house w-5 text-center"></i> Dashboard
                 </a>
                 <a href="{% url 'productos' %}" class="menu-item">
@@ -39,9 +38,11 @@
                 <a href="{% url 'inventario' %}" class="menu-item">
                     <i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Inventario
                 </a>
+                <!-- Nuevo enlace de Ventas -->
+                <a href="{% url 'ventas' %}" class="menu-item">
+                    <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Ventas
+                </a>
                 
-                <!-- Enlaces inactivos por ahora -->
-                <a href="#" class="menu-item"><i class="fa-solid fa-cart-shopping w-5 text-center"></i> Ventas</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-arrow-rotate-left w-5 text-center"></i> Devoluciones</a>
                 <a href="#" class="menu-item"><i class="fa-regular fa-user w-5 text-center"></i> Clientes</a>
                 <a href="#" class="menu-item"><i class="fa-solid fa-truck-fast w-5 text-center"></i> Proveedores</a>
@@ -51,7 +52,6 @@
             </nav>
         </div>
 
-        <!-- Pie del Sidebar -->
         <div class="p-4 border-t border-pink-200">
             <a href="#" class="menu-item hover:text-red-500 mb-4"><i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Cerrar sesión</a>
             <div class="text-center mt-2">
@@ -61,14 +61,13 @@
         </div>
     </aside>
 
-    <!-- Contenedor Derecho (Header y Contenido) -->
     <div class="flex-1 flex flex-col h-full overflow-hidden">
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0 shadow-sm">
             <div class="flex items-center gap-6 w-1/2">
                 <i class="fa-solid fa-bars text-gray-600 cursor-pointer text-xl"></i>
                 <div class="relative w-full max-w-lg">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-2.5 text-gray-400"></i>
-                    <input type="text" placeholder="Buscar productos, usuarios, ventas..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm">
+                    <input type="text" placeholder="Buscar..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm">
                 </div>
             </div>
             <div class="flex items-center gap-6">
