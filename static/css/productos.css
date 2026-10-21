@@ -1,0 +1,24 @@
+/* ==========================================================================
+   MÓDULO: PRODUCTOS
+   Estilos específicos únicamente para la pantalla de catálogo de productos
+   ========================================================================== */
+
+/* Píldora para indicar las variantes (ej: 4 Tonos, 2 Tamaños) */
+.badge-variante {
+    background-color: #e0e7ff; /* Azul muy claro */
+    color: #4338ca;            /* Azul oscuro */
+    border: 1px solid #c7d2fe;
+}
+
+/* Píldora para indicar que un producto no tiene variantes */
+.badge-sin-variante {
+    background-color: #f9fafb;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+/* Píldora para productos que fueron desactivados del catálogo */
+.badge-inactivo {
+    background-color: #e5e7eb;
+    color: #374151;
+}
