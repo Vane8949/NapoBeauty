@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- CSS exclusivo de Usuarios -->
+<link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Fecha -->
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+    <div class="flex-1">
+        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Usuarios</h1>
+        <p class="text-gray-600 text-sm">Administra los perfiles del personal, roles, permisos y accesos al sistema de Napo Beauty</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex flex-col gap-2">
+            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Agregar Usuario</button>
+            <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-key"></i> Roles y Permisos</button>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
+                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-clock"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hora</p>
+                    <p class="text-xs font-bold text-gray-800">10:32 a. m.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de Indicadores (KPIs) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
+        <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-users"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Total de Usuarios</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">8</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-up"></i> Activos</p>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
+        <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-solid fa-user-tie"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Administradores</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">2</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
+        <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-cash-register"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Vendedores / Almacén</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">6</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FBCFE8] border-[#F9A8D4]">
+        <div class="tarjeta-icono bg-[#F9A8D4] text-[#BE185D]"><i class="fa-solid fa-wifi"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Sesiones Activas</p>
+            <h2 class="text-2xl font-extrabold text-gray-900">4</h2>
+            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-circle"></i> Hoy</p>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Usuarios -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    
+    <!-- Filtros -->
+    <div class="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <div class="relative w-full lg:w-1/3">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-2.5 text-gray-400"></i>
+            <input type="text" placeholder="Buscar usuario por nombre, correo o rol..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-300 focus:ring-1 focus:ring-pink-300 text-sm">
+        </div>
+        <div class="w-full lg:w-auto flex flex-wrap gap-3">
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>Rol</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>Estado</option>
+            </select>
+            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
+                <option>Ordenar por</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Contenido de Tabla -->
+    <div class="overflow-x-auto">
+        <table class="tabla-napo">
+            <thead>
+                <tr>
+                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
+                    <th>Usuario</th>
+                    <th>Correo Electrónico</th>
+                    <th>Rol</th>
+                    <th>Módulos de Acceso</th>
+                    <th>Último Acceso</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Fila de ejemplo (repetir para cada usuario) -->
+                <tr>
+                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
+                    <td class="flex items-center gap-3">
+                        <img src="{% static 'img/usuarios/alberth.jpg' %}" alt="Foto" class="w-9 h-9 rounded-full object-cover border border-pink-100">
+                        <div>
+                            <p class="font-bold text-gray-800">Alberth Izaguirre</p>
+                        </div>
+                    </td>
+                    <td class="text-sm text-gray-600">alberth.izaguirre@napobeauty.com</td>
+                    <td><span class="badge badge-rol-admin p-1 px-2 rounded-md text-xs font-medium">Administrador</span></td>
+                    <td><span class="badge badge-acceso-total p-1 px-3 rounded-full text-xs font-semibold">Acceso Total</span></td>
+                    <td class="text-sm text-gray-600">17/04/2025 10:15 am</td>
+                    <td><span class="badge badge-exito">Activo</span></td>
+                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
+                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
+                        <button class="hover:text-yellow-600"><i class="fa-solid fa-key"></i></button>
+                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
+                    </td>
+                </tr>
+                <!-- Fin de fila de ejemplo -->
+                <!-- Puedes copiar la fila anterior y cambiar los datos para los demás usuarios -->
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
