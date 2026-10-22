@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- CSS exclusivo de Configuración -->
+<link rel="stylesheet" href="{% static 'css/configuracion.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Fecha -->
+<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
+    <div class="flex-1">
+        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Configuración</h1>
+        <p class="text-gray-600 text-sm">Administra los parámetros del sistema, alertas, impuestos, PWA y respaldos</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex flex-col gap-2">
+            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Guardar Cambios</button>
+            <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-rotate-left"></i> Restaurar Valores</button>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
+                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
+                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-clock"></i></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-medium">Hora</p>
+                    <p class="text-xs font-bold text-gray-800">10:32 a. m.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de Indicadores (KPIs del Sistema) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
+        <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-mobile-screen"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Estado de la PWA</p>
+            <h2 class="text-xl font-extrabold text-gray-900 leading-tight">Activa<br>Instalable</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
+        <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-solid fa-money-bill-wave"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Moneda e Impuesto</p>
+            <h2 class="text-xl font-extrabold text-gray-900 leading-tight">Córdoba (C$)<br>15% IVA</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
+        <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-bell"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Reglas de Alerta</p>
+            <h2 class="text-xl font-extrabold text-gray-900 leading-tight">Stock < 5 |<br>Caducidad 30d</h2>
+        </div>
+    </div>
+    <div class="tarjeta-kpi bg-[#FFEDD5] border-[#FDBA74]">
+        <div class="tarjeta-icono bg-[#FDBA74] text-[#C2410C]"><i class="fa-solid fa-database"></i></div>
+        <div>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Último Respaldo BD</p>
+            <h2 class="text-xl font-extrabold text-gray-900 leading-tight">Hoy<br>08:00 a. m.</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Menú de Pestañas (Tabs) -->
+<div class="flex flex-wrap gap-3 mb-6">
+    <button class="tab-activa">General y Negocio</button>
+    <button class="tab-inactiva">Alertas e Inventario</button>
+    <button class="tab-inactiva">Aplicación PWA</button>
+    <button class="tab-inactiva">Pagos y Envíos</button>
+    <button class="tab-inactiva">Seguridad y Backups</button>
+</div>
+
+<!-- Formulario de Configuración -->
+<div class="bg-white p-8 rounded-2xl shadow-sm border border-[#d1fae5] max-w-3xl">
+    <h3 class="text-xl font-bold text-gray-800 mb-6">Información Comercial y Facturación</h3>
+    
+    <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <label class="form-label md:col-span-1">Nombre comercial</label>
+            <div class="md:col-span-2">
+                <input type="text" class="form-input" value="Napo Beauty">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <label class="form-label md:col-span-1">RUC</label>
+            <div class="md:col-span-2">
+                <input type="text" class="form-input" value="J0310000123456">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <label class="form-label md:col-span-1">Teléfono</label>
+            <div class="md:col-span-2">
+                <input type="text" class="form-input" value="+505 8888-9999">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <label class="form-label md:col-span-1">Correo</label>
+            <div class="md:col-span-2">
+                <input type="email" class="form-input" value="admin@napobeauty.com">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <label class="form-label md:col-span-1">Moneda Base</label>
+            <div class="md:col-span-2">
+                <select class="form-input appearance-none">
+                    <option selected>Córdoba Nicaragüense (C$)</option>
+                    <option>Dólar Estadounidense (USD)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <label class="form-label md:col-span-1">Dirección</label>
+            <div class="md:col-span-2">
+                <input type="text" class="form-input" value="Managua, Nicaragua">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
