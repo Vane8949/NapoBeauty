@@ -1,5 +1,5 @@
 from django.urls import path
-from .Rutas import dashboard, productos, inventario, ventas, devoluciones, clientes, proveedores, reportes, usuarios
+from .Rutas import dashboard, productos, inventario, ventas, devoluciones, clientes, proveedores, reportes, usuarios, configuracion
 
 urlpatterns = [
     path('', dashboard.panel_principal, name='dashboard'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('proveedores/', proveedores.panel_proveedores, name='proveedores'),
     path('reportes/', reportes.panel_reportes, name='reportes'),
     path('usuarios/', usuarios.panel_usuarios, name='usuarios'),
+    path('configuracion/', configuracion.panel_configuracion, name='configuracion'),
 ]
