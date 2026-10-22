@@ -1,0 +1,84 @@
+/* ==========================================================================
+   MÓDULO: CONFIGURACIÓN
+   Estilos para ajustes del sistema, formularios y pestañas
+   ========================================================================== */
+
+/* Botones Superiores */
+.btn-oscuro {
+    background-color: #831843;
+    color: var(--napo-blanco);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-oscuro:hover { background-color: #9d174d; }
+
+.btn-secundario {
+    background-color: var(--napo-rosado-claro);
+    color: var(--napo-texto-oscuro);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-secundario:hover { background-color: #fbcfe8; }
+
+/* --- Pestañas de Navegación (Tabs) --- */
+.tab-activa {
+    background-color: #fbcfe8; /* Rosado claro */
+    color: #be185d;            /* Texto rosado oscuro */
+    font-weight: bold;
+    padding: 0.4rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid #f9a8d4;
+}
+
+.tab-inactiva {
+    background-color: #9ca3af; /* Gris */
+    color: #ffffff;            /* Texto blanco */
+    font-weight: 500;
+    padding: 0.4rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    transition: background-color 0.2s ease;
+}
+
+.tab-inactiva:hover {
+    background-color: #6b7280;
+}
+
+/* --- Formulario --- */
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.form-input {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+    background-color: #f9fafb;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    border-color: #f472b6;
+    background-color: #ffffff;
+}
