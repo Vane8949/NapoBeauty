@@ -1,0 +1,47 @@
+/* ==========================================================================
+   MÓDULO: LOGOUT (CERRAR SESIÓN)
+   Estilos para el modal de confirmación global
+   ========================================================================== */
+
+/* Fondo oscuro desenfocado detrás del modal */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+}
+
+/* Contenedor del ícono rosado */
+.icono-logout-bg {
+    background-color: #fce7f3; /* Rosado muy claro */
+    color: #f472b6;            /* Ícono rosado */
+}
+
+/* Botón de Cancelar */
+.btn-cancelar {
+    background-color: #e5e7eb;
+    color: #374151;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.btn-cancelar:hover { background-color: #d1d5db; }
+
+/* Botón de Confirmar Salida */
+.btn-confirmar-salir {
+    background-color: #831843; /* Vino oscuro */
+    color: var(--napo-blanco);
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+.btn-confirmar-salir:hover { background-color: #9d174d; }
