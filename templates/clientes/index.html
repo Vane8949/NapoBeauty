@@ -1,188 +1,105 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_css %}
-<!-- CSS exclusivo de Clientes -->
-<link rel="stylesheet" href="{% static 'css/clientes.css' %}">
-{% endblock %}
-
 {% block content %}
-<!-- Encabezado y Fecha -->
-<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
-    <div class="flex-1">
-        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Clientes</h1>
-        <p class="text-gray-600 text-sm">Gestiona la base de datos de tus clientes, historial de compras y perfiles</p>
+<div class="mb-6 flex justify-between items-start">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-800">Clientes</h1>
+        <p class="text-gray-500 text-sm mt-1">Gestiona la base de datos de tus clientes, historial de compras y perfiles</p>
     </div>
-    
-    <div class="flex flex-col sm:flex-row items-center gap-4">
-        <div class="flex flex-col gap-2">
-            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Registrar Cliente</button>
-            <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-download"></i> Historial de Puntos</button>
-        </div>
-
-        <div class="flex flex-col gap-2">
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
-                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-calendar"></i></div>
-                <div>
-                    <p class="text-[10px] text-gray-500 font-medium">Hoy es</p>
-                    <p class="text-xs font-bold text-gray-800">17 de abril de 2025</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-pink-100 flex items-center gap-3 w-48">
-                <div class="w-8 h-8 text-napo-text rounded-lg flex items-center justify-center text-lg"><i class="fa-regular fa-clock"></i></div>
-                <div>
-                    <p class="text-[10px] text-gray-500 font-medium">Hora</p>
-                    <p class="text-xs font-bold text-gray-800">10:32 a. m.</p>
-                </div>
-            </div>
-        </div>
+    <div class="flex flex-col gap-3">
+        <button class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus"></i> Registrar Cliente
+        </button>
+        <button class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+            <i class="fa-solid fa-download"></i> Historial de Puntos
+        </button>
     </div>
 </div>
 
-<!-- Tarjetas de Indicadores (KPIs) -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-    <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
-        <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-users"></i></div>
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-users"></i></div>
         <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Total de Clientes</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">1,254</h2>
-            <p class="text-[10px] text-green-600 font-bold mt-1">+12% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+            <p class="text-xs text-gray-500 font-medium">Total de Clientes</p>
+            <h2 class="text-2xl font-bold text-gray-800">1,254</h2>
+            <p class="text-[10px] text-green-500 font-bold mt-1">+12% <span class="text-gray-400 font-normal">vs. mes anterior</span></p>
         </div>
     </div>
-    <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
-        <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-regular fa-user"></i></div>
+    <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center text-lg"><i class="fa-regular fa-user"></i></div>
         <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Clientes Activos</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">982</h2>
-            <p class="text-[10px] text-green-600 font-bold mt-1">+5% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+            <p class="text-xs text-gray-500 font-medium">Clientes Activos</p>
+            <h2 class="text-2xl font-bold text-gray-800">982</h2>
+            <p class="text-[10px] text-green-500 font-bold mt-1">+5% <span class="text-gray-400 font-normal">vs. mes anterior</span></p>
         </div>
     </div>
-    <div class="tarjeta-kpi bg-[#FBCFE8] border-[#F9A8D4]">
-        <div class="tarjeta-icono bg-[#F9A8D4] text-[#BE185D]"><i class="fa-solid fa-user-plus"></i></div>
+    <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-pink-200 text-pink-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-plus"></i></div>
         <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Clientes Nuevos (Mes)</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">124</h2>
-            <p class="text-[10px] text-green-600 font-bold mt-1">+10% <span class="text-gray-500 font-normal">vs. mes anterior</span></p>
+            <p class="text-xs text-gray-500 font-medium">Clientes Nuevos (Mes)</p>
+            <h2 class="text-2xl font-bold text-gray-800">124</h2>
+            <p class="text-[10px] text-green-500 font-bold mt-1">+10% <span class="text-gray-400 font-normal">vs. mes anterior</span></p>
         </div>
     </div>
-    <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
-        <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-money-bill-wave"></i></div>
-        <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Ticket Promedio General</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">C$ 745.00</h2>
-        </div>
+    <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm border border-yellow-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-yellow-200 text-yellow-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-money-bill-wave"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Ticket Promedio General</p><h2 class="text-2xl font-bold text-gray-800">C$ 745.00</h2></div>
     </div>
 </div>
 
-<!-- Tabla de Clientes -->
+<!-- Tabla -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    
-    <!-- Filtros -->
-    <div class="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-center justify-between">
-        <div class="relative w-full lg:w-1/3">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-2.5 text-gray-400"></i>
-            <input type="text" placeholder="Buscar por ID, cliente, venta..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-pink-300 focus:ring-1 focus:ring-pink-300 text-sm">
+    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
+        <div class="relative w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            <input type="text" placeholder="Buscar por ID, cliente, venta..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
         </div>
-        <div class="w-full lg:w-auto flex flex-wrap gap-3">
-            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
-                <option>Estado</option>
-            </select>
-            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
-                <option>Nivel de Cliente</option>
-            </select>
-            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
-                <option>Fecha de registro</option>
-            </select>
-            <select class="border border-gray-200 text-gray-600 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-300">
-                <option>Ordenar por</option>
-            </select>
+        <div class="flex gap-2">
+            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Estado</option></select>
+            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Nivel de Cliente</option></select>
+            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Fecha de registro</option></select>
+            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Ordenar por</option></select>
         </div>
     </div>
-
-    <!-- Contenido de Tabla -->
-    <div class="overflow-x-auto">
-        <table class="tabla-napo">
-            <thead>
-                <tr>
-                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
-                    <th>ID Cliente</th>
-                    <th>Cliente</th>
-                    <th>Teléfono</th>
-                    <th>Nivel</th>
-                    <th>Compras Realizadas</th>
-                    <th>Total Invertido (C$)</th>
-                    <th>Última Compra</th>
-                    <th>Estado</th>
-                    <th class="text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td class="font-bold text-gray-600">#1024</td>
-                    <td><p class="font-bold text-gray-800">Ana García</p><p class="text-xs text-gray-500">ana.garcia@email.com</p></td>
-                    <td>+505 8888-8888</td>
-                    <td><span class="badge badge-diamante">Diamante</span></td>
-                    <td>35 Compras</td>
-                    <td class="font-bold text-gray-900">C$ 18,450.00</td>
-                    <td>17/04/2025</td>
-                    <td><span class="badge badge-exito">Activo</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
-                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td class="font-bold text-gray-600">#1023</td>
-                    <td><p class="font-bold text-gray-800">María López</p><p class="text-xs text-gray-500">maria.lopez@email.com</p></td>
-                    <td>+505 7777-7777</td>
-                    <td><span class="badge badge-oro">Oro</span></td>
-                    <td>18 Compras</td>
-                    <td class="font-bold text-gray-900">C$ 8,240.00</td>
-                    <td>16/04/2025</td>
-                    <td><span class="badge badge-exito">Activo</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
-                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td class="font-bold text-gray-600">#1022</td>
-                    <td><p class="font-bold text-gray-800">Fernanda Torres</p><p class="text-xs text-gray-500">fernanda.t@email.com</p></td>
-                    <td>+505 5555-5555</td>
-                    <td><span class="badge badge-plata">Plata</span></td>
-                    <td>8 Compras</td>
-                    <td class="font-bold text-gray-900">C$ 3,120.00</td>
-                    <td>14/04/2025</td>
-                    <td><span class="badge badge-exito">Activo</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
-                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td class="font-bold text-gray-600">#1020</td>
-                    <td><p class="font-bold text-gray-800">Valeria Ruiz</p><p class="text-xs text-gray-500">valeria.ruiz@email.com</p></td>
-                    <td>+505 7456-7890</td>
-                    <td><span class="badge badge-bronce">Bronce</span></td>
-                    <td>0 Compras</td>
-                    <td class="font-bold text-gray-900">C$ 0.00</td>
-                    <td>Nunca</td>
-                    <td><span class="badge badge-inactivo">Inactivo</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
-                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table class="w-full text-left text-sm">
+        <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+            <tr>
+                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
+                <th class="py-4 px-6">ID Cliente</th>
+                <th class="py-4 px-6">Cliente</th>
+                <th class="py-4 px-6">Teléfono</th>
+                <th class="py-4 px-6 text-center">Nivel</th>
+                <th class="py-4 px-6 text-center">Compras Realizadas</th>
+                <th class="py-4 px-6">Total Invertido (C$)</th>
+                <th class="py-4 px-6">Última Compra</th>
+                <th class="py-4 px-6 text-center">Estado</th>
+                <th class="py-4 px-6 text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
+                <td class="py-4 px-6 font-medium">#1024</td>
+                <td class="py-4 px-6">
+                    <p class="font-bold text-gray-800">Ana García</p>
+                    <p class="text-xs text-gray-400">ana.garcia@email.com</p>
+                </td>
+                <td class="py-4 px-6 text-gray-500">+505 8888-8888</td>
+                <td class="py-4 px-6 text-center"><span class="bg-purple-100 text-purple-600 text-[11px] px-3 py-1 rounded-full font-bold">Diamante</span></td>
+                <td class="py-4 px-6 text-center text-gray-500">35 Compras</td>
+                <td class="py-4 px-6 font-bold">C$ 18,450.00</td>
+                <td class="py-4 px-6 text-gray-500 text-xs">17/04/2025</td>
+                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Activo</span></td>
+                
+                <!-- COLUMNA ACCIONES CORREGIDA -->
+                <td class="py-4 px-6 text-center whitespace-nowrap">
+                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
+                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 {% endblock %}
