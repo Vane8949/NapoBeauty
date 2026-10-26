@@ -1,18 +1,17 @@
 /* ==========================================================================
-   MÓDULO: LOGIN (AUTENTICACIÓN)
-   Pantalla de inicio de sesión de Napo Beauty
+   MÓDULO: LOGIN (AUTENTICACIÓN) - ESTILOS REFINADOS
    ========================================================================== */
 
 body.login-bg {
-    /* Degradado suave de blanco a rosado claro inspirado en el diseño */
-    background: linear-gradient(180deg, #ffffff 0%, #fff0f5 50%, #ffe4e6 100%);
+    /* Degradado radial suave para imitar la iluminación del diseño original */
+    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #fff0f5 60%, #ffe4e6 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Campos de texto con íconos */
+/* Campos de texto con íconos refinados */
 .input-icono-container {
     position: relative;
     width: 100%;
@@ -23,7 +22,8 @@ body.login-bg {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #6b7280;
+    color: #9ca3af; /* Gris más suave (gray-400) */
+    font-size: 0.9rem;
 }
 
 .input-icono-derecha {
@@ -31,62 +31,71 @@ body.login-bg {
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #6b7280;
+    color: #9ca3af;
     cursor: pointer;
+    font-size: 0.9rem;
 }
 
 .input-auth {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem; /* Espacio para el ícono izquierdo */
-    border: 1px solid #d1d5db;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid #e5e7eb; /* Borde mucho más sutil y limpio */
     border-radius: 0.5rem;
     font-size: 0.875rem;
     background-color: #ffffff;
+    color: #374151;
     outline: none;
     transition: all 0.3s ease;
 }
 
-.input-auth:focus {
-    border-color: #f472b6;
-    box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.2);
+.input-auth::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
 }
 
-/* Botón principal degradado */
+.input-auth:focus {
+    border-color: #f472b6;
+    box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.15);
+}
+
+/* Botón principal con degradado suave y sombra brillante (glow) */
 .btn-auth-principal {
-    background: linear-gradient(90deg, #ec4899 0%, #f43f5e 100%);
+    background: linear-gradient(90deg, #f472b6 0%, #db2777 100%); /* Rosa a magenta profundo */
     color: white;
     width: 100%;
     padding: 0.875rem;
     border-radius: 0.75rem;
-    font-weight: bold;
+    font-weight: 600; /* Ligeramente menos grueso que bold */
     border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 14px 0 rgba(236, 72, 153, 0.39);
+    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.4), 0 8px 10px -6px rgba(219, 39, 119, 0.2);
     transition: all 0.3s ease;
 }
 
 .btn-auth-principal:hover {
-    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.23);
-    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -5px rgba(219, 39, 119, 0.5);
+    transform: translateY(-2px);
 }
 
-/* Botones sociales (Google/Apple) */
+/* Botones sociales más limpios */
 .btn-social {
     background-color: #ffffff;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #f3f4f6; /* Borde casi imperceptible */
     color: #374151;
     width: 100%;
     padding: 0.75rem;
     border-radius: 0.75rem;
     font-weight: 500;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     cursor: pointer;
-    transition: background-color 0.2s;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
 }
 
 .btn-social:hover {
     background-color: #f9fafb;
+    border-color: #e5e7eb;
 }
