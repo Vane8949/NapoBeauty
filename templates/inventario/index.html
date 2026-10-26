@@ -1,86 +1,75 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_css %}
-<!-- CSS exclusivo de Inventario -->
-<link rel="stylesheet" href="{% static 'css/inventario.css' %}">
-{% endblock %}
-
 {% block content %}
-<div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-6">
-    <div class="flex-1">
-        <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Inventario</h1>
-        <p class="text-gray-600 text-sm">Controla el stock, variaciones, ubicaciones y movimientos de mercancía</p>
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-800">Inventario</h1>
+        <p class="text-gray-500 text-sm mt-1">Controla el stock, variaciones, ubicaciones y movimientos de mercancía</p>
     </div>
-    
-    <div class="flex flex-col sm:flex-row items-center gap-4">
-        <div class="flex gap-3">
-            <button class="btn-primario"><i class="fa-solid fa-plus"></i> Ajustar Stock</button>
-            <button class="btn-primario">Movimientos</button>
-        </div>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-    <div class="tarjeta-kpi">
-        <div class="tarjeta-icono bg-pink-100 text-napo-primary"><i class="fa-solid fa-box-open"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium mb-0.5">Total de Stock</p>
-            <h2 class="text-2xl font-extrabold text-gray-800">2,845</h2>
-        </div>
-    </div>
-    <div class="tarjeta-kpi">
-        <div class="tarjeta-icono bg-red-100 text-red-500"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium mb-0.5">Alertas</p>
-            <h2 class="text-2xl font-extrabold text-gray-800">14</h2>
-        </div>
-    </div>
-    <div class="tarjeta-kpi">
-        <div class="tarjeta-icono bg-yellow-100 text-yellow-600"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium mb-0.5">Próximos a Caducar</p>
-            <h2 class="text-2xl font-extrabold text-gray-800">11</h2>
-        </div>
-    </div>
-    <div class="tarjeta-kpi">
-        <div class="tarjeta-icono bg-yellow-100 text-yellow-600"><i class="fa-solid fa-coins"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium mb-0.5">Valor Total</p>
-            <h2 class="text-2xl font-extrabold text-gray-800">C$ 342,150.00</h2>
-        </div>
+    <div class="flex gap-3">
+        <button class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Ajustar Stock
+        </button>
+        <button class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors">
+            Movimientos
+        </button>
     </div>
 </div>
 
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-pink-50 text-napo-primary rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-box"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Total de Stock</p><h2 class="text-2xl font-bold text-gray-800">2,845</h2></div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Alertas</p><h2 class="text-2xl font-bold text-gray-800">14</h2></div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-clock"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Próximos a Caducar</p><h2 class="text-2xl font-bold text-gray-800">11</h2></div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+        <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-coins"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Valor Total</p><h2 class="text-2xl font-bold text-gray-800">C$ 342,150.00</h2></div>
+    </div>
+</div>
+
+<!-- Tabla -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="tabla-napo">
-            <thead>
-                <tr>
-                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
-                    <th>Producto / SKU</th>
-                    <th>Ubicación</th>
-                    <th>Stock Actual</th>
-                    <th>Caducidad</th>
-                    <th>Estado</th>
-                    <th class="text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td><p class="font-bold text-gray-800">Labial Velvet Matte</p><p class="text-xs text-gray-500">SKU: NAP-001</p></td>
-                    <td>Almacén Principal</td>
-                    <td><span class="badge badge-exito">50 (En stock)</span></td>
-                    <td>13/11/2027</td>
-                    <td><span class="badge badge-exito">Óptimo</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-red-500"><i class="fa-regular fa-trash-can"></i></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <table class="w-full text-left text-sm">
+        <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+            <tr>
+                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
+                <th class="py-4 px-6">Producto / SKU</th>
+                <th class="py-4 px-6">Ubicación</th>
+                <th class="py-4 px-6 text-center">Stock Actual</th>
+                <th class="py-4 px-6 text-center">Caducidad</th>
+                <th class="py-4 px-6 text-center">Estado</th>
+                <th class="py-4 px-6 text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
+                <td class="py-4 px-6">
+                    <p class="font-bold text-gray-800">Labial Velvet Matte</p>
+                    <p class="text-xs text-gray-400">SKU: NAP-001</p>
+                </td>
+                <td class="py-4 px-6 text-gray-500">Almacén Principal</td>
+                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">50 (En stock)</span></td>
+                <td class="py-4 px-6 text-center text-gray-500">13/11/2027</td>
+                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Óptimo</span></td>
+                
+                <!-- COLUMNA ACCIONES CORREGIDA -->
+                <td class="py-4 px-6 text-center">
+                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
+                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 {% endblock %}
