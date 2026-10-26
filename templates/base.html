@@ -34,6 +34,7 @@
             </div>
 
             <nav class="p-4 space-y-1">
+                <!-- Elementos del menú -->
                 <a href="{% url 'dashboard' %}" class="menu-item"><i class="fa-solid fa-house w-5 text-center"></i> Dashboard</a>
                 <a href="{% url 'productos' %}" class="menu-item"><i class="fa-solid fa-box w-5 text-center"></i> Productos</a>
                 <a href="{% url 'inventario' %}" class="menu-item"><i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Inventario</a>
@@ -54,7 +55,7 @@
             </button>
             <div class="text-center mt-2">
                 <p class="text-napo-text font-bold text-sm">Napo Beauty</p>
-                <p class="text-[11px] text-gray-500">Belleza en cada detalle <i class="fa-regular fa-heart text-napo-primary"></i></p>
+                <p class="text-[11px] text-gray-500"> <i class="fa-regular fa-heart text-napo-primary"></i></p>
             </div>
         </div>
     </aside>
@@ -97,8 +98,8 @@
             </p>
             <div class="flex gap-4 justify-center">
                 <button onclick="cerrarModalLogout()" class="btn-cancelar flex-1">Cancelar</button>
-                <!-- Aquí irá luego la ruta a la vista de logout de Django -->
-                <a href="#" class="btn-confirmar-salir flex-1">Sí, cerrar sesión</a>
+                <!-- BOTÓN CORREGIDO AL LOGIN -->
+                <a href="{% url 'login' %}" class="btn-confirmar-salir flex-1" style="text-decoration: none;">Sí, cerrar sesión</a>
             </div>
         </div>
     </div>
