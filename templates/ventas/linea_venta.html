@@ -1,0 +1,17 @@
+{# Una línea de producto de "Registrar venta". Variable: linea (formulario del formset) #}
+<div data-linea class="{% if linea.DELETE.value %}hidden {% endif %}grid grid-cols-[1fr_6rem] sm:grid-cols-[1fr_6rem_7rem_2.5rem] gap-3 px-3 py-3 items-start">
+    <div>
+        {{ linea.producto }}
+        {% for error in linea.producto.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        <p data-aviso-stock class="hidden text-xs text-red-600 mt-1"></p>
+    </div>
+    <div>
+        {{ linea.cantidad }}
+        {% for error in linea.cantidad.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+    </div>
+    <p data-importe class="text-right font-bold text-gray-800 pt-2.5 whitespace-nowrap">C$ 0.00</p>
+    <div class="flex justify-end">
+        <span class="hidden">{{ linea.DELETE }}</span>
+        <button type="button" data-quitar-linea class="w-9 h-9 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50" title="Quitar" aria-label="Quitar producto"><i class="fa-solid fa-trash-can"></i></button>
+    </div>
+</div>
