@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static napo %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-start">
+    <div>
+        <h1 class="text-3xl font-extrabold text-gray-800">Devoluciones</h1>
+        <p class="text-gray-500 text-sm mt-1">Productos que la tienda le regresa a sus proveedores: defectuosos, vencidos o de un pedido equivocado</p>
+    </div>
+    <div class="flex flex-col gap-3">
+        {% if puede_crear %}
+        <a href="{% url 'devolucion_proveedor_crear' %}" data-modal class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+            <i class="fa-solid fa-truck-ramp-box"></i> Devolver a proveedor
+        </a>
+        <a href="{% url 'devolucion_crear' %}" data-modal class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-plus"></i> Devolución de cliente
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'devoluciones/pestanas.html' %}
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-truck-ramp-box"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Devoluciones a proveedores</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.total }}</h2></div>
+    </div>
+    <a href="?estado=Pendiente" class="bg-yellow-50 p-5 rounded-2xl shadow-sm border border-yellow-100 flex items-center gap-4 hover:border-yellow-300">
+        <div class="w-10 h-10 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Pendientes o enviadas</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.abiertas }}</h2></div>
+    </a>
+    <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Unidades devueltas</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.unidades }}</h2></div>
+    </div>
+    <div class="bg-green-50 p-5 rounded-2xl shadow-sm border border-green-100 flex items-center gap-4">
+        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Crédito o reembolso recibido</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.acreditado|cordobas }}</h2></div>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <form method="get" class="p-4 border-b border-gray-100 flex flex-wrap gap-3 justify-between items-center">
+        <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar por #, proveedor o factura..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <select name="origen" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los orígenes</option>
+                {% for valor, nombre in origenes %}<option value="{{ valor }}" {% if origen == valor %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+            </select>
+            <select name="estado" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los estados</option>
+                {% for valor, nombre in estados %}<option value="{{ valor }}" {% if estado == valor %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+                <option value="anuladas" {% if estado == 'anuladas' %}selected{% endif %}>Anuladas</option>
+            </select>
+            {% if busqueda %}<a href="{% url 'devoluciones_proveedor' %}" class="px-3 py-2 text-sm text-gray-500 hover:text-pink-600">Limpiar</a>{% endif %}
+        </div>
+    </form>
+    <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+        <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+            <tr>
+                <th class="py-4 px-4">#</th>
+                <th class="py-4 px-4">Proveedor</th>
+                <th class="py-4 px-4">Fecha</th>
+                <th class="py-4 px-4">Origen</th>
+                <th class="py-4 px-4">Motivo</th>
+                <th class="py-4 px-4 text-center">Unidades</th>
+                <th class="py-4 px-4">Costo</th>
+                <th class="py-4 px-4">Resolución</th>
+                <th class="py-4 px-4 text-center">Estado</th>
+                <th class="py-4 px-4 text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            {% for d in pagina %}
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition {% if not d.activo %}opacity-60{% endif %}">
+                <td class="py-4 px-4 font-medium"><a href="{% url 'devolucion_proveedor_detalle' d.pk %}" class="hover:text-pink-600">#{{ d.pk }}</a></td>
+                <td class="py-4 px-4"><a href="{% url 'proveedor_detalle' d.proveedor_id %}" class="font-bold text-gray-800 hover:text-pink-600">{{ d.proveedor.nombre_empresa }}</a>{% if d.factura_proveedor %}<p class="text-xs text-gray-400">Factura {{ d.factura_proveedor }}</p>{% endif %}</td>
+                <td class="py-4 px-4 text-gray-500 text-xs whitespace-nowrap">{{ d.fecha|date:'d/m/Y' }}</td>
+                <td class="py-4 px-4 text-gray-500">{% if d.devolucion_id %}<a href="{% url 'devolucion_detalle' d.devolucion_id %}" class="hover:text-pink-600">Cliente · dev. #{{ d.devolucion_id }}</a>{% else %}Inventario{% endif %}</td>
+                <td class="py-4 px-4 text-gray-500">{{ d.get_motivo_display }}</td>
+                <td class="py-4 px-4 text-center font-medium">{{ d.unidades|default:0 }}</td>
+                <td class="py-4 px-4 font-bold whitespace-nowrap">{{ d.costo|cordobas }}</td>
+                <td class="py-4 px-4 text-gray-500">{{ d.get_resolucion_display }}</td>
+                <td class="py-4 px-4 text-center">{% include 'devoluciones/estado_proveedor.html' %}</td>
+                <td class="py-4 px-4 text-center">
+                    {% url 'devolucion_proveedor_detalle' d.pk as url_ver %}{% url 'devolucion_proveedor_editar' d.pk as url_editar %}
+                    {% if puede_editar %}{% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %}{% else %}{% include 'componentes/acciones.html' with ver=url_ver %}{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            {% include 'componentes/fila_vacia.html' with columnas=10 texto='Todavía no hay devoluciones a proveedores.' %}
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% include 'componentes/paginacion.html' %}
+</div>
+{% endblock %}
