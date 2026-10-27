@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static napo %}
 
 {% block content %}
 <div class="mb-6 flex justify-between items-start">
@@ -8,9 +8,11 @@
         <p class="text-gray-500 text-sm mt-1">Administra los perfiles del personal, roles, permisos y accesos al sistema de Napo Beauty</p>
     </div>
     <div class="flex flex-col gap-3">
-        <button class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+        {% if puede_crear %}
+        <a href="{% url 'usuario_crear' %}" data-modal class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus"></i> Agregar Usuario
-        </button>
+        </a>
+        {% endif %}
         <button class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-key"></i> Roles y Permisos
         </button>
@@ -21,76 +23,88 @@
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
     <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-users"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium">Total de Usuarios</p>
-            <h2 class="text-2xl font-bold text-gray-800">8</h2>
-            <p class="text-[10px] text-green-500 font-bold mt-1"><i class="fa-solid fa-arrow-up"></i> Activos</p>
-        </div>
+        <div><p class="text-xs text-gray-500 font-medium">Total de Usuarios</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.total }}</h2></div>
     </div>
     <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-tie"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Administradores</p><h2 class="text-2xl font-bold text-gray-800">2</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Administradores</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.administradores }}</h2></div>
     </div>
     <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm border border-yellow-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-cash-register"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Vendedores / Almacén</p><h2 class="text-2xl font-bold text-gray-800">6</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Vendedores / Cajeros</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.cajeros }}</h2></div>
     </div>
     <div class="bg-pink-100 p-5 rounded-2xl shadow-sm border border-pink-200 flex items-center gap-4">
-        <div class="w-10 h-10 bg-pink-200 text-pink-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-wifi"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium">Sesiones Activas</p>
-            <h2 class="text-2xl font-bold text-gray-800">4</h2>
-            <p class="text-[10px] text-green-500 font-bold mt-1">● Hoy</p>
-        </div>
+        <div class="w-10 h-10 bg-pink-200 text-pink-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-slash"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Deshabilitados</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.inactivos }}</h2></div>
     </div>
 </div>
 
 <!-- Tabla -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
-        <div class="relative w-72">
+    <form method="get" class="p-4 border-b border-gray-100 flex flex-wrap gap-3 justify-between items-center bg-white">
+        <div class="relative w-full sm:w-72">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-            <input type="text" placeholder="Buscar usuario por nombre, correo o rol..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar usuario por nombre, usuario o correo..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
         </div>
-        <div class="flex gap-2">
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Rol</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Estado</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Ordenar por</option></select>
+        <div class="flex flex-wrap gap-2">
+            <select name="rol" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los roles</option>
+                {% for r in roles %}<option value="{{ r.pk }}" {% if rol == r.pk|stringformat:'s' %}selected{% endif %}>{{ r.nombre }}</option>{% endfor %}
+            </select>
+            <select name="estado" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los estados</option>
+                <option value="activos" {% if estado == 'activos' %}selected{% endif %}>Activos</option>
+                <option value="inactivos" {% if estado == 'inactivos' %}selected{% endif %}>Deshabilitados</option>
+            </select>
+            {% if busqueda %}<a href="{% url 'usuarios' %}" class="px-3 py-2 text-sm text-gray-500 hover:text-pink-600">Limpiar</a>{% endif %}
         </div>
-    </div>
+    </form>
+    <div class="overflow-x-auto">
     <table class="w-full text-left text-sm">
         <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
             <tr>
-                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
                 <th class="py-4 px-6">Usuario</th>
                 <th class="py-4 px-6">Correo Electrónico</th>
                 <th class="py-4 px-6 text-center">Rol</th>
-                <th class="py-4 px-6 text-center">Módulos de Acceso</th>
+                <th class="py-4 px-6 text-center">Permisos</th>
                 <th class="py-4 px-6">Último Acceso</th>
                 <th class="py-4 px-6 text-center">Estado</th>
                 <th class="py-4 px-6 text-center">Acciones</th>
             </tr>
         </thead>
         <tbody class="text-gray-700">
+            {% for u in pagina %}
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
-                <td class="py-4 px-6 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gray-200 rounded-full flex-shrink-0 overflow-hidden"><img src="{% static 'img/avatar.png' %}" alt="" onerror="this.style.display='none'"></div>
-                    <span class="font-bold text-gray-800">Alberth Izaguirre</span>
+                <td class="py-4 px-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-pink-100 text-pink-600 flex-shrink-0 flex items-center justify-center text-xs font-extrabold">{{ u|iniciales }}</div>
+                        <div>
+                            <a href="{% url 'usuario_detalle' u.pk %}" class="font-bold text-gray-800 hover:text-pink-600">{{ u }}</a>
+                            <p class="text-xs text-gray-400">@{{ u.nombre_usuario }}</p>
+                        </div>
+                    </div>
                 </td>
-                <td class="py-4 px-6 text-gray-500">alberth.izaguirre@napobeauty.com</td>
-                <td class="py-4 px-6 text-center"><span class="bg-purple-100 text-purple-600 text-[11px] px-3 py-1 rounded-full font-bold">Administrador</span></td>
-                <td class="py-4 px-6 text-center"><span class="bg-purple-600 text-white text-[11px] px-3 py-1 rounded-full font-bold">Acceso Total</span></td>
-                <td class="py-4 px-6 text-gray-500 text-xs">17/04/2025 10:15 am</td>
-                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Activo</span></td>
-                
-                <!-- COLUMNA ACCIONES CORREGIDA -->
-                <td class="py-4 px-6 text-center whitespace-nowrap">
-                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
-                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                <td class="py-4 px-6 text-gray-500">{{ u.correo }}</td>
+                <td class="py-4 px-6 text-center">
+                    <span class="text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap {% if u.rol.nombre == 'Administrador' %}bg-purple-100 text-purple-600{% else %}bg-yellow-100 text-yellow-700{% endif %}">{{ u.rol.nombre }}</span>
+                </td>
+                <td class="py-4 px-6 text-center">
+                    {% if u.num_permisos >= total_permisos and total_permisos %}<span class="bg-purple-600 text-white text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">Acceso Total</span>
+                    {% else %}<span class="bg-gray-100 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ u.num_permisos }} de {{ total_permisos }}</span>{% endif %}
+                </td>
+                <td class="py-4 px-6 text-gray-500 text-xs whitespace-nowrap">{{ u.ultimo_acceso|date:'d/m/Y h:i a'|default:'Nunca' }}</td>
+                <td class="py-4 px-6 text-center">{% include 'componentes/estado.html' with activo=u.activo %}</td>
+                <td class="py-4 px-6 text-center">
+                    {% url 'usuario_detalle' u.pk as url_ver %}{% url 'usuario_editar' u.pk as url_editar %}
+                    {% if puede_editar %}{% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %}{% else %}{% include 'componentes/acciones.html' with ver=url_ver %}{% endif %}
                 </td>
             </tr>
+            {% empty %}
+            {% include 'componentes/fila_vacia.html' with columnas=7 texto='Todavía no hay usuarios registrados.' %}
+            {% endfor %}
         </tbody>
     </table>
+    </div>
+    {% include 'componentes/paginacion.html' %}
 </div>
 {% endblock %}
