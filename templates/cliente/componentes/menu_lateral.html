@@ -1,0 +1,38 @@
+{% load static %}
+{# Menú lateral: datos del cliente, secciones de la cuenta y banner #}
+<aside id="barra-lateral" class="barra-lateral w-[240px] shrink-0 flex flex-col bg-rosa-50 border-r border-rosa-100 overflow-y-auto">
+    <a href="{% url 'cliente:mi_cuenta' %}" class="flex items-center gap-2.5 mx-2 mt-4 mb-3 p-2 rounded-2xl hover:bg-white transition">
+        <span class="w-11 h-11 shrink-0 rounded-full bg-white border border-rosa-200 flex items-center justify-center">
+            <i class="fa-regular fa-user text-lg"></i>
+        </span>
+        <span class="min-w-0 flex-1">
+            <span class="block font-bold text-sm truncate">{{ cliente.nombre }}</span>
+            <span class="block text-xs text-gray-600 truncate">{{ cliente.correo }}</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+    </a>
+
+    <nav class="px-3 space-y-1" aria-label="Menú del cliente">
+        <button id="btn-categorias" type="button" class="item-lateral w-full" aria-haspopup="true" aria-expanded="false" aria-controls="mega-menu">
+            <i class="fa-solid fa-bars"></i> Todas las categorías
+        </button>
+        <a href="#" class="item-lateral {% if seccion == 'pedidos' %}activo{% endif %}"><i class="fa-solid fa-box-open"></i> Mis pedidos</a>
+        <a href="#" class="item-lateral {% if seccion == 'favoritos' %}activo{% endif %}"><i class="fa-regular fa-heart"></i> Mis productos favoritos</a>
+        <a href="#" class="item-lateral {% if seccion == 'deseos' %}activo{% endif %}"><i class="fa-regular fa-bookmark"></i> Mi lista de deseos</a>
+        <a href="#" class="item-lateral {% if seccion == 'direcciones' %}activo{% endif %}"><i class="fa-solid fa-location-dot"></i> Direcciones</a>
+        <a href="#" class="item-lateral {% if seccion == 'pagos' %}activo{% endif %}"><i class="fa-regular fa-credit-card"></i> Métodos de pago</a>
+        <a href="#" class="item-lateral {% if seccion == 'configuracion' %}activo{% endif %}"><i class="fa-solid fa-gear"></i> Configuración de cuenta</a>
+        <a href="#" class="item-lateral {% if seccion == 'ayuda' %}activo{% endif %}"><i class="fa-regular fa-circle-question"></i> Ayuda</a>
+        <hr class="!my-3 border-rosa-200">
+        <a href="#" class="item-lateral {% if seccion == 'puntos' %}activo{% endif %}"><i class="fa-solid fa-gift"></i> Recompensas y Puntos</a>
+    </nav>
+
+    <!-- Banner inferior -->
+    <div class="mt-auto p-3 pt-6">
+        <div class="rounded-2xl bg-gradient-to-b from-rosa-100 to-rosa-200/70 px-4 py-6 text-center">
+            <p class="font-manuscrita text-2xl leading-snug text-rosa-700 -rotate-3">¡Tu belleza,<br>en un solo lugar!</p>
+            <i class="fa-regular fa-heart text-rosa-600 text-xl my-3 block"></i>
+            <img src="{% static 'img/logo.png' %}" alt="" class="w-24 h-24 mx-auto rounded-full object-cover bg-white shadow-sm">
+        </div>
+    </div>
+</aside>
