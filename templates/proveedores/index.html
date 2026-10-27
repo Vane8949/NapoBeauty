@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static napo %}
 
 {% block content %}
 <div class="mb-6 flex justify-between items-start">
@@ -8,9 +8,11 @@
         <p class="text-gray-500 text-sm mt-1">Administra, añade y edita el directorio de proveedores y compras de Napo Beauty</p>
     </div>
     <div class="flex flex-col gap-3">
-        <button class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+        {% if puede_crear %}
+        <a href="{% url 'proveedor_crear' %}" data-modal class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus"></i> Registrar Proveedor
-        </button>
+        </a>
+        {% endif %}
         <button class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-download"></i> Historial de Compras
         </button>
@@ -21,45 +23,46 @@
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
     <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-box"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Total de Proveedores</p><h2 class="text-2xl font-bold text-gray-800">42</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Total de Proveedores</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.total }}</h2></div>
     </div>
     <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center text-lg"><i class="fa-regular fa-user"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Proveedores Activos</p><h2 class="text-2xl font-bold text-gray-800">38</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Proveedores Activos</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.activos }}</h2></div>
     </div>
     <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm border border-yellow-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-circle-exclamation"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Órdenes de Compra Pendientes</p><h2 class="text-2xl font-bold text-gray-800">6</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Órdenes de Compra Pendientes</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.pendientes }}</h2></div>
     </div>
     <div class="bg-orange-50 p-5 rounded-2xl shadow-sm border border-orange-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-coins"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Inversión del Mes</p><h2 class="text-2xl font-bold text-gray-800">C$ 84,250.00</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Inversión del Mes</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.inversion_mes|cordobas }}</h2></div>
     </div>
 </div>
 
 <!-- Tabla -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
-        <div class="relative w-72">
+    <form method="get" class="p-4 border-b border-gray-100 flex flex-wrap gap-3 justify-between items-center bg-white">
+        <div class="relative w-full sm:w-72">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-            <input type="text" placeholder="Buscar por proveedor, contacto o marca..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar por proveedor, contacto, RUC o marca..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
         </div>
         <div class="flex gap-2">
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Estado</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Categoría de Productos</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>País/Origen</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Ordenar por</option></select>
+            <select name="estado" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los estados</option>
+                <option value="activos" {% if estado == 'activos' %}selected{% endif %}>Activos</option>
+                <option value="inactivos" {% if estado == 'inactivos' %}selected{% endif %}>Deshabilitados</option>
+            </select>
+            {% if busqueda %}<a href="{% url 'proveedores' %}" class="px-3 py-2 text-sm text-gray-500 hover:text-pink-600">Limpiar</a>{% endif %}
         </div>
-    </div>
+    </form>
+    <div class="overflow-x-auto">
     <table class="w-full text-left text-sm">
         <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
             <tr>
-                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
-                <th class="py-4 px-6">ID Proveedor</th>
-                <th class="py-4 px-6">Proveedor / Marca</th>
-                <th class="py-4 px-6">Nombre de Contacto</th>
-                <th class="py-4 px-6">Teléfono</th>
-                <th class="py-4 px-6 text-center">Categoría</th>
+                <th class="py-4 px-6">ID</th>
+                <th class="py-4 px-6">Proveedor</th>
+                <th class="py-4 px-6">Contacto</th>
+                <th class="py-4 px-6 text-center">Productos</th>
                 <th class="py-4 px-6 text-center">Órdenes Pendientes</th>
                 <th class="py-4 px-6">Total Comprado</th>
                 <th class="py-4 px-6 text-center">Estado</th>
@@ -67,30 +70,33 @@
             </tr>
         </thead>
         <tbody class="text-gray-700">
+            {% for p in pagina %}
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
-                <td class="py-4 px-6 font-medium">#PROV01</td>
-                <td class="py-4 px-6">
-                    <p class="font-bold text-gray-800">Cosméticos del Pacífico</p>
-                    <p class="text-xs text-gray-400">Distribuidora / Marcas aliadas</p>
+                <td class="py-4 px-6 font-medium text-gray-500">#{{ p.pk }}</td>
+                <td class="py-4 px-6 min-w-[13rem]">
+                    <a href="{% url 'proveedor_detalle' p.pk %}" class="font-bold text-gray-800 hover:text-pink-600">{{ p.nombre_empresa }}</a>
+                    <p class="text-xs text-gray-400 whitespace-nowrap">{% if p.ruc %}RUC {{ p.ruc }}{% else %}Sin RUC{% endif %}</p>
                 </td>
                 <td class="py-4 px-6">
-                    <p class="font-bold text-gray-800">Carlos Mendoza</p>
-                    <p class="text-xs text-gray-400">carlos.m@...</p>
+                    <p class="font-bold text-gray-800">{{ p.nombre_contacto|default:'—' }}</p>
+                    <p class="text-xs text-gray-400">{{ p.correo|default:'' }}</p>
+                    <p class="text-xs text-gray-500 whitespace-nowrap">{{ p.telefono|default:'' }}</p>
                 </td>
-                <td class="py-4 px-6 text-gray-500">+505 8888-9999</td>
-                <td class="py-4 px-6 text-center text-gray-500">Maquillaje</td>
-                <td class="py-4 px-6 text-center font-medium">0</td>
-                <td class="py-4 px-6 font-bold">C$ 45,200.00</td>
-                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Activo</span></td>
-                
-                <!-- COLUMNA ACCIONES CORREGIDA -->
-                <td class="py-4 px-6 text-center whitespace-nowrap">
-                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
-                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                <td class="py-4 px-6 text-center text-gray-500">{{ p.num_productos }}</td>
+                <td class="py-4 px-6 text-center font-medium {% if p.pendientes %}text-yellow-600{% endif %}">{{ p.pendientes }}</td>
+                <td class="py-4 px-6 font-bold whitespace-nowrap">{{ p.total_comprado|cordobas }}</td>
+                <td class="py-4 px-6 text-center">{% include 'componentes/estado.html' with activo=p.activo %}</td>
+                <td class="py-4 px-6 text-center">
+                    {% url 'proveedor_detalle' p.pk as url_ver %}{% url 'proveedor_editar' p.pk as url_editar %}
+                    {% if puede_editar %}{% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %}{% else %}{% include 'componentes/acciones.html' with ver=url_ver %}{% endif %}
                 </td>
             </tr>
+            {% empty %}
+            {% include 'componentes/fila_vacia.html' with columnas=8 texto='Todavía no hay proveedores registrados.' %}
+            {% endfor %}
         </tbody>
     </table>
+    </div>
+    {% include 'componentes/paginacion.html' %}
 </div>
 {% endblock %}
