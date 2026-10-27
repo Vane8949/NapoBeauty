@@ -218,7 +218,7 @@ CREATE TABLE dbo.MovimientoInventario (
     StockAnterior   INT                NOT NULL,
     StockNuevo      INT                NOT NULL,
     Motivo          NVARCHAR(200)      NULL,
-    TipoReferencia  NVARCHAR(20)       NULL,              -- 'Venta', 'Compra', 'Devolucion'
+    TipoReferencia  NVARCHAR(20)       NULL,              -- 'Venta', 'Compra', 'Devolucion', 'DevProveedor'
     ReferenciaId    INT                NULL,              -- Id de la venta/compra/devolución
     Fecha           DATETIME2(0)       NOT NULL CONSTRAINT DF_MovimientoInventario_Fecha DEFAULT (SYSDATETIME()),
     CONSTRAINT PK_MovimientoInventario PRIMARY KEY (MovimientoInventarioId),
@@ -438,13 +438,62 @@ CREATE TABLE dbo.DetalleDevolucion (
     DevolucionId     INT               NOT NULL,
     DetalleVentaId   INT               NOT NULL,          -- qué línea de la venta se devuelve
     Cantidad         INT               NOT NULL,
-    RegresaAInventario BIT             NOT NULL CONSTRAINT DF_DetalleDevolucion_Regresa DEFAULT (0),  -- 0 si está dañado
+    RegresaAInventario BIT             NOT NULL CONSTRAINT DF_DetalleDevolucion_Regresa DEFAULT (0),  -- 1 si Destino = 'Inventario'
+    Destino          NVARCHAR(20)      NOT NULL CONSTRAINT DF_DetalleDevolucion_Destino DEFAULT (N'Inventario'),
     CONSTRAINT PK_DetalleDevolucion PRIMARY KEY (DetalleDevolucionId),
     CONSTRAINT UQ_DetalleDevolucion UNIQUE (DevolucionId, DetalleVentaId),
     CONSTRAINT FK_DetalleDevolucion_Devolucion FOREIGN KEY (DevolucionId) REFERENCES dbo.Devolucion (DevolucionId),
     CONSTRAINT FK_DetalleDevolucion_DetalleVenta FOREIGN KEY (DetalleVentaId) REFERENCES dbo.DetalleVenta (DetalleVentaId),
-    CONSTRAINT CK_DetalleDevolucion_Cantidad CHECK (Cantidad > 0)
+    CONSTRAINT CK_DetalleDevolucion_Cantidad CHECK (Cantidad > 0),
+    -- Inventario: regresa al stock · Baja: se descarta · Proveedor: se le regresa al proveedor
+    CONSTRAINT CK_DetalleDevolucion_Destino CHECK (Destino IN (N'Inventario', N'Baja', N'Proveedor'))
 );
+
+-- Productos que la tienda le devuelve a un proveedor (defectuosos, vencidos, pedido equivocado...).
+-- Origen 'Inventario': salen del stock al registrarla. Origen 'Cliente': los devolvió un cliente.
+CREATE TABLE dbo.DevolucionProveedor (
+    DevolucionProveedorId INT IDENTITY(1,1) NOT NULL,
+    ProveedorId      INT               NOT NULL,
+    DevolucionId     INT               NULL,              -- si viene de la devolución de un cliente
+    UsuarioId        INT               NULL,              -- quién la registró / resolvió
+    Origen           NVARCHAR(20)      NOT NULL CONSTRAINT DF_DevolucionProveedor_Origen DEFAULT (N'Inventario'),
+    Fecha            DATETIME2(0)      NOT NULL CONSTRAINT DF_DevolucionProveedor_Fecha DEFAULT (SYSDATETIME()),
+    FechaResolucion  DATETIME2(0)      NULL,
+    Motivo           NVARCHAR(40)      NOT NULL,
+    Resolucion       NVARCHAR(20)      NOT NULL CONSTRAINT DF_DevolucionProveedor_Resolucion DEFAULT (N'Reposición'),
+    Estado           NVARCHAR(20)      NOT NULL CONSTRAINT DF_DevolucionProveedor_Estado DEFAULT (N'Pendiente'),
+    MontoCredito     DECIMAL(12,2)     NOT NULL CONSTRAINT DF_DevolucionProveedor_Monto DEFAULT (0),  -- nota de crédito o reembolso
+    FacturaProveedor NVARCHAR(30)      NULL,              -- factura del proveedor donde vino el producto
+    Descripcion      NVARCHAR(500)     NULL,
+    Activo           BIT               NOT NULL CONSTRAINT DF_DevolucionProveedor_Activo DEFAULT (1),
+    CONSTRAINT PK_DevolucionProveedor PRIMARY KEY (DevolucionProveedorId),
+    CONSTRAINT FK_DevolucionProveedor_Proveedor FOREIGN KEY (ProveedorId) REFERENCES dbo.Proveedor (ProveedorId),
+    CONSTRAINT FK_DevolucionProveedor_Devolucion FOREIGN KEY (DevolucionId) REFERENCES dbo.Devolucion (DevolucionId),
+    CONSTRAINT FK_DevolucionProveedor_Usuario FOREIGN KEY (UsuarioId) REFERENCES dbo.Usuario (UsuarioId),
+    CONSTRAINT CK_DevolucionProveedor_Origen CHECK (Origen IN (N'Inventario', N'Cliente')),
+    CONSTRAINT CK_DevolucionProveedor_Motivo CHECK (Motivo IN (N'Defecto de fábrica', N'Producto vencido', N'Producto dañado', N'Error en el pedido', N'Otro')),
+    CONSTRAINT CK_DevolucionProveedor_Resolucion CHECK (Resolucion IN (N'Reposición', N'Nota de crédito', N'Reembolso')),
+    CONSTRAINT CK_DevolucionProveedor_Estado CHECK (Estado IN (N'Pendiente', N'Enviada', N'Completada', N'Rechazada')),
+    CONSTRAINT CK_DevolucionProveedor_Monto CHECK (MontoCredito >= 0)
+);
+CREATE INDEX IX_DevolucionProveedor_ProveedorId ON dbo.DevolucionProveedor (ProveedorId);
+CREATE INDEX IX_DevolucionProveedor_Estado      ON dbo.DevolucionProveedor (Estado);
+
+CREATE TABLE dbo.DetalleDevolucionProveedor (
+    DetalleDevolucionProveedorId INT IDENTITY(1,1) NOT NULL,
+    DevolucionProveedorId INT          NOT NULL,
+    ProductoId       INT               NOT NULL,
+    Cantidad         INT               NOT NULL,
+    CostoUnitario    DECIMAL(10,2)     NOT NULL,          -- precio de compra al momento de devolver
+    Subtotal         AS (Cantidad * CostoUnitario) PERSISTED,
+    CONSTRAINT PK_DetalleDevolucionProveedor PRIMARY KEY (DetalleDevolucionProveedorId),
+    CONSTRAINT UQ_DetalleDevolucionProveedor UNIQUE (DevolucionProveedorId, ProductoId),
+    CONSTRAINT FK_DetalleDevolucionProveedor_Devolucion FOREIGN KEY (DevolucionProveedorId) REFERENCES dbo.DevolucionProveedor (DevolucionProveedorId),
+    CONSTRAINT FK_DetalleDevolucionProveedor_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId),
+    CONSTRAINT CK_DetalleDevolucionProveedor_Cantidad CHECK (Cantidad > 0),
+    CONSTRAINT CK_DetalleDevolucionProveedor_Costo CHECK (CostoUnitario >= 0)
+);
+CREATE INDEX IX_DetalleDevolucionProveedor_ProductoId ON dbo.DetalleDevolucionProveedor (ProductoId);
 
 
 /* =============================================================================
@@ -721,6 +770,20 @@ CREATE TRIGGER dbo.TR_DetalleDevolucion_NoBorrar ON dbo.DetalleDevolucion INSTEA
 BEGIN
     SET NOCOUNT ON;
     THROW 50001, N'No se permite borrar en DetalleDevolucion. Deshabilite el documento principal (Devolucion) con Activo = 0.', 1;
+END;
+GO
+
+CREATE TRIGGER dbo.TR_DevolucionProveedor_NoBorrar ON dbo.DevolucionProveedor INSTEAD OF DELETE AS
+BEGIN
+    SET NOCOUNT ON;
+    THROW 50001, N'No se permite borrar en DevolucionProveedor. Deshabilite el registro con Activo = 0.', 1;
+END;
+GO
+
+CREATE TRIGGER dbo.TR_DetalleDevolucionProveedor_NoBorrar ON dbo.DetalleDevolucionProveedor INSTEAD OF DELETE AS
+BEGIN
+    SET NOCOUNT ON;
+    THROW 50001, N'No se permite borrar en DetalleDevolucionProveedor. Deshabilite el documento principal (DevolucionProveedor) con Activo = 0.', 1;
 END;
 GO
 
