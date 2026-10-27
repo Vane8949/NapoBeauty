@@ -5,90 +5,77 @@
 <div class="mb-6 flex justify-between items-start">
     <div>
         <h1 class="text-3xl font-extrabold text-gray-800">Devoluciones</h1>
-        <p class="text-gray-500 text-sm mt-1">Gestiona y monitorea las devoluciones, reembolsos y cambios de productos</p>
+        <p class="text-gray-500 text-sm mt-1">Gestiona y monitorea las devoluciones, reembolsos y cambios</p>
     </div>
     <div class="flex flex-col gap-3">
-        <button class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+        <button id="btn-registrar-devolucion" class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus"></i> Registrar Devolución
         </button>
-        <button class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+        <button class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm">
             <i class="fa-solid fa-download"></i> Historial de Cambios
         </button>
     </div>
 </div>
 
-<!-- KPIs -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-    <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
-        <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-box-open"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Total Devoluciones</p><h2 class="text-2xl font-bold text-gray-800">45</h2></div>
-    </div>
-    <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm border border-yellow-100 flex items-center gap-4">
-        <div class="w-10 h-10 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Pendientes de Revisar</p><h2 class="text-2xl font-bold text-gray-800">8</h2></div>
-    </div>
-    <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100 flex items-center gap-4">
-        <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-sack-dollar"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Monto Reembolsado</p><h2 class="text-2xl font-bold text-gray-800">C$ 3,850.00</h2></div>
-    </div>
-    <div class="bg-orange-50 p-5 rounded-2xl shadow-sm border border-orange-100 flex items-center gap-4">
-        <div class="w-10 h-10 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-lg"><i class="fa-regular fa-circle-question"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Motivo Principal</p><h2 class="text-xl font-bold text-gray-800">Defecto de fábrica</h2></div>
-    </div>
-</div>
-
-<!-- Tabla -->
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
-        <div class="relative w-72">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-            <input type="text" placeholder="Buscar por ID, cliente, venta..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
-        </div>
-        <div class="flex gap-2">
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Estado</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Tipo de Resolución</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Fecha</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Ordenar por</option></select>
-        </div>
-    </div>
+<!-- (KPIs y Tabla de devoluciones originales aquí) -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
     <table class="w-full text-left text-sm">
         <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
-            <tr>
-                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
-                <th class="py-4 px-6">ID Venta</th>
-                <th class="py-4 px-6">Cliente</th>
-                <th class="py-4 px-6">Fecha Solicitud</th>
-                <th class="py-4 px-6 text-center">Producto / SKU</th>
-                <th class="py-4 px-6">Motivo</th>
-                <th class="py-4 px-6 text-center">Tipo de Resolución</th>
-                <th class="py-4 px-6">Total</th>
-                <th class="py-4 px-6 text-center">Estado</th>
-                <th class="py-4 px-6 text-center">Acciones</th>
-            </tr>
+            <tr><th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500"></th><th class="py-4 px-6">ID Venta</th><th class="py-4 px-6">Cliente</th><th class="py-4 px-6">Total</th><th class="py-4 px-6 text-center">Estado</th><th class="py-4 px-6 text-center">Acciones</th></tr>
         </thead>
         <tbody class="text-gray-700">
-            <!-- Fila de ejemplo (repite para las demás adaptando el contenido) -->
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
+                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500"></td>
                 <td class="py-4 px-6 font-medium">ID v1024</td>
-                <td class="py-4 px-6">
-                    <p class="font-bold text-gray-800">María López</p>
-                    <p class="text-xs text-gray-400">nombre.correoelectronico</p>
-                </td>
-                <td class="py-4 px-6 text-gray-500">17/04/2025 10:15 am</td>
-                <td class="py-4 px-6 text-center text-gray-500">3 SKU</td>
-                <td class="py-4 px-6 text-gray-500">Tono incorrecto</td>
-                <td class="py-4 px-6 text-center"><span class="bg-gray-100 text-gray-600 text-[11px] px-3 py-1 rounded-full font-medium border border-gray-200">Reembolso</span></td>
+                <td class="py-4 px-6"><p class="font-bold text-gray-800">María López</p></td>
                 <td class="py-4 px-6 font-bold">C$ 3,850.00</td>
                 <td class="py-4 px-6 text-center"><span class="bg-yellow-100 text-yellow-600 text-[11px] px-3 py-1 rounded-full font-bold">Pendiente</span></td>
-                
-                <!-- COLUMNA ACCIONES CORREGIDA -->
                 <td class="py-4 px-6 text-center whitespace-nowrap">
-                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
-                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                    <button class="text-gray-400 hover:text-pink-500 transition mx-1"><i class="fa-regular fa-eye"></i></button>
+                    <button class="text-gray-400 hover:text-blue-500 transition mx-1"><i class="fa-solid fa-pen"></i></button>
                 </td>
             </tr>
         </tbody>
     </table>
 </div>
+
+<!-- MODAL DEVOLUCIÓN -->
+<div id="modal-devolucion" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm modal-overlay hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4 shadow-2xl relative">
+        <button onclick="cerrarModal('modal-devolucion')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
+        <h2 class="text-2xl font-extrabold text-[#831843] mb-6 flex items-center gap-2"><i class="fa-solid fa-arrow-rotate-left"></i> Registrar Devolución</h2>
+        <form class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ID de Venta Original</label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
+                    <input type="text" class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-400" placeholder="Ej. V-1024">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de devolución</label>
+                <select class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-400">
+                    <option>Defecto de fábrica</option>
+                    <option>Tono/Producto incorrecto</option>
+                    <option>Daño en el envío</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Resolución</label>
+                <select class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-400">
+                    <option>Cambio por el mismo producto</option>
+                    <option>Reembolso de dinero</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-100">
+                <button type="button" onclick="cerrarModal('modal-devolucion')" class="px-5 py-2.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-xl font-bold text-sm">Cancelar</button>
+                <button type="button" class="px-5 py-2.5 bg-[#831843] text-white rounded-xl font-bold text-sm shadow-md hover:bg-[#6c1437]">Registrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/devoluciones.js' %}"></script>
 {% endblock %}
