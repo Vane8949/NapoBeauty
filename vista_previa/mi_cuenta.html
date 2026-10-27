@@ -1,0 +1,817 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi cuenta preview</title>
+<!-- Tipografías: títulos (Playfair Display), texto (Roboto), frase del banner (Dancing Script) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@700;800&family=Roboto:wght@400;500;700&display=swap">
+<!-- Librerías externas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>// Paleta y tipografías de la tienda (vista cliente) para Tailwind
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+rosa: {
+50: '#FFF6F9',
+100: '#FDE8EF',
+200: '#F9D0DE',
+300: '#F3A8C2',
+500: '#E9578C',
+600: '#D63F78',
+700: '#AF2A62',
+},
+tinta: '#1F1A1C',
+},
+fontFamily: {
+titulo: ['"Playfair Display"', 'Georgia', 'serif'],
+cuerpo: ['Roboto', 'system-ui', 'sans-serif'],
+manuscrita: ['"Dancing Script"', 'cursive'],
+},
+},
+},
+};
+</script>
+<!-- Estilos de la tienda -->
+<style>/* ==========================================================================
+TIENDA (VISTA CLIENTE) - Napo Beauty
+Estilos que complementan a Tailwind. Colores iguales a js/tienda-config.js
+========================================================================== */
+:root {
+--rosa-50: #FFF6F9;
+--rosa-100: #FDE8EF;
+--rosa-200: #F9D0DE;
+--rosa-300: #F3A8C2;
+--rosa-500: #E9578C;
+--rosa-600: #D63F78;
+--rosa-700: #AF2A62;
+--tinta: #1F1A1C;
+}
+/* ---------- Cabecera ---------- */
+.cabecera-tienda {
+background: linear-gradient(90deg, #FBE1EA 0%, #FDEFF4 55%, #FBE3EB 100%);
+}
+.enlace-cabecera {
+display: flex;
+align-items: center;
+gap: .5rem;
+padding: .35rem .5rem;
+border-radius: .75rem;
+color: var(--tinta);
+transition: background-color .15s;
+}
+.enlace-cabecera:hover { background-color: rgba(255, 255, 255, .7); }
+.insignia {
+position: absolute;
+top: -.55rem;
+right: -.7rem;
+min-width: 1.15rem;
+height: 1.15rem;
+padding: 0 .3rem;
+border-radius: 999px;
+background: var(--rosa-500);
+color: #fff;
+font-size: .65rem;
+font-weight: 700;
+line-height: 1.15rem;
+text-align: center;
+border: 2px solid #FDEFF4;
+box-sizing: content-box;
+}
+.insignia.salta { animation: salta .4s ease; }
+@keyframes salta { 50% { transform: scale(1.35); } }
+.menu-desplegable { animation: aparece .15s ease-out; }
+.opcion-desplegable {
+display: flex;
+align-items: center;
+gap: .75rem;
+padding: .55rem 1rem;
+font-size: .875rem;
+}
+.opcion-desplegable i { width: 1rem; text-align: center; }
+.opcion-desplegable:hover { background: var(--rosa-50); }
+/* ---------- Menú lateral ---------- */
+.barra-lateral {
+position: fixed;
+top: 4rem;
+left: 0;
+bottom: 0;
+z-index: 40;
+transform: translateX(-100%);
+transition: transform .25s ease;
+}
+.barra-lateral.abierta { transform: none; box-shadow: 0 10px 40px rgba(0, 0, 0, .15); }
+@media (min-width: 1024px) {
+.barra-lateral {
+position: sticky;
+height: calc(100vh - 4rem);
+transform: none;
+transition: none;
+}
+.barra-lateral.colapsada { display: none; }
+}
+.item-lateral {
+display: flex;
+align-items: center;
+gap: .85rem;
+padding: .55rem .75rem;
+border-radius: .65rem;
+font-size: .95rem;
+color: var(--tinta);
+text-align: left;
+transition: background-color .15s;
+}
+.item-lateral i { width: 1.15rem; text-align: center; font-size: 1.05rem; }
+.item-lateral:hover { background: rgba(255, 255, 255, .8); }
+.item-lateral.activo { background: var(--rosa-200); font-weight: 500; }
+/* ---------- Menú de categorías ---------- */
+.mega-menu {
+position: absolute;
+left: 222px;
+top: 7.5rem;
+z-index: 45;
+width: min(490px, calc(100vw - 2rem));
+max-height: calc(100vh - 6rem);
+overflow-y: auto;
+padding: 1.25rem 1.25rem 1rem;
+background: #fff;
+border: 1px solid var(--rosa-100);
+border-radius: 1rem;
+box-shadow: 0 18px 50px -12px rgba(175, 42, 98, .25);
+animation: aparece .15s ease-out;
+}
+@media (max-width: 1023px) {
+.mega-menu { position: fixed; left: 1rem; right: 1rem; top: 4.75rem; width: auto; }
+}
+@keyframes aparece {
+from { opacity: 0; transform: translateY(-6px); }
+to { opacity: 1; transform: none; }
+}
+/* ---------- Componentes ---------- */
+.circulo-icono {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+border-radius: 999px;
+background: var(--rosa-100);
+color: var(--rosa-600);
+}
+.tarjeta {
+background: #fff;
+border: 1px solid #ECE4E7;
+border-radius: .85rem;
+transition: box-shadow .2s, border-color .2s, transform .2s;
+}
+a.tarjeta:hover, article.tarjeta:hover {
+border-color: var(--rosa-200);
+box-shadow: 0 10px 25px -12px rgba(175, 42, 98, .3);
+}
+.acceso-rapido {
+display: flex;
+align-items: center;
+gap: .85rem;
+padding: .75rem .9rem;
+min-height: 5rem;
+}
+.ver-mas {
+display: inline-flex;
+align-items: center;
+gap: .35rem;
+font-size: .9rem;
+color: var(--rosa-700);
+white-space: nowrap;
+}
+.ver-mas:hover { text-decoration: underline; }
+.btn-favorito {
+width: 2rem;
+height: 2rem;
+border-radius: 999px;
+background: #fff;
+color: var(--rosa-500);
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+transition: transform .15s;
+}
+.btn-favorito:hover { transform: scale(1.1); }
+.btn-carrito {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: .5rem;
+width: 100%;
+padding: .6rem .75rem;
+border-radius: .5rem;
+background: var(--rosa-500);
+color: #fff;
+font-size: .875rem;
+font-weight: 500;
+transition: background-color .15s;
+}
+.btn-carrito:hover { background: var(--rosa-600); }
+.btn-carrito.agregado { background: #2F9E6B; }
+.barra-progreso {
+height: .5rem;
+border-radius: 999px;
+background: #ECE7E9;
+overflow: hidden;
+}
+.barra-progreso span {
+display: block;
+height: 100%;
+border-radius: inherit;
+background: linear-gradient(90deg, var(--rosa-300), var(--rosa-500));
+}
+/* Aviso flotante */
+.aviso {
+position: fixed;
+left: 50%;
+bottom: 1.5rem;
+z-index: 60;
+padding: .7rem 1.1rem;
+border-radius: .75rem;
+background: var(--tinta);
+color: #fff;
+font-size: .875rem;
+opacity: 0;
+pointer-events: none;
+transform: translate(-50%, 1rem);
+transition: opacity .2s, transform .2s;
+}
+.aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+/* Foco visible para teclado */
+.tarjeta:focus-visible, .item-lateral:focus-visible, .btn-carrito:focus-visible,
+.btn-favorito:focus-visible, .enlace-cabecera:focus-visible {
+outline: 3px solid var(--rosa-300);
+outline-offset: 2px;
+}
+</style>
+</head>
+<body class="font-cuerpo text-tinta bg-white antialiased">
+<!-- ===================== CABECERA ===================== -->
+<header class="cabecera-tienda sticky top-0 z-50 h-16 flex items-center gap-2 sm:gap-4 pr-3 sm:pr-6 border-b border-rosa-100">
+<a href="#" class="flex items-center justify-center shrink-0 pl-3 lg:pl-0 lg:w-[222px]" aria-label="Napo Beauty, inicio">
+<img src="LOGO" alt="Napo Beauty" class="w-12 h-12 rounded-full object-cover bg-white shadow-sm">
+</a>
+<button id="btn-hamburguesa" type="button" class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-tinta hover:bg-white/70 transition" aria-label="Mostrar u ocultar menú" aria-controls="barra-lateral" aria-expanded="false">
+<i class="fa-solid fa-bars text-lg"></i>
+</button>
+<form action="#" method="get" role="search" class="flex-1 min-w-0 max-w-[580px]">
+<label for="buscador" class="sr-only">Buscar</label>
+<div class="relative">
+<i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-tinta text-sm"></i>
+<input id="buscador" name="q" type="search" placeholder="Buscar productos, marcas, categorías..." class="w-full h-10 pl-11 pr-4 bg-white border border-rosa-200 rounded-full text-sm placeholder:text-gray-500 shadow-sm focus:outline-none focus:border-rosa-300 focus:ring-4 focus:ring-rosa-100">
+</div>
+</form>
+<div class="ml-auto flex items-center gap-1 sm:gap-4">
+<!-- Favoritos -->
+<a href="#" class="enlace-cabecera flex-col" aria-label="Favoritos">
+<span class="relative">
+<i class="fa-regular fa-heart text-xl"></i>
+<span id="contador-favoritos" class="insignia">10</span>
+</span>
+<span class="hidden sm:block text-[11px] font-medium mt-0.5">Favoritos</span>
+</a>
+<!-- Menú de usuario -->
+<div class="relative">
+<button id="btn-usuario" type="button" class="enlace-cabecera" aria-haspopup="true" aria-expanded="false" aria-controls="menu-usuario">
+<i class="fa-regular fa-user text-xl"></i>
+<span class="hidden md:inline text-sm font-medium">Hola, Vanessa</span>
+<i class="fa-solid fa-chevron-down text-[10px] hidden md:inline"></i>
+</button>
+<div id="menu-usuario" class="menu-desplegable hidden absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-rosa-100 py-2 z-50">
+<a href="#" class="opcion-desplegable"><i class="fa-regular fa-user"></i> Mi cuenta</a>
+<a href="#" class="opcion-desplegable"><i class="fa-solid fa-box-open"></i> Mis pedidos</a>
+<a href="#" class="opcion-desplegable"><i class="fa-regular fa-heart"></i> Favoritos</a>
+<hr class="my-2 border-rosa-100">
+<a href="#" class="opcion-desplegable text-rosa-700"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+</div>
+</div>
+<!-- Carrito -->
+<a href="#" class="enlace-cabecera" aria-label="Carrito">
+<span class="relative">
+<i class="fa-solid fa-cart-shopping text-xl"></i>
+<span id="contador-carrito" class="insignia">3</span>
+</span>
+<span class="hidden sm:inline text-sm font-medium">Carrito</span>
+</a>
+</div>
+</header>
+<div id="contenedor-tienda" class="relative flex min-h-[calc(100vh-4rem)]">
+<!-- Fondo oscuro cuando el menú lateral está abierto en móvil -->
+<div id="fondo-menu" class="fixed inset-0 top-16 bg-black/30 z-30 hidden"></div>
+<!-- ===================== MENÚ LATERAL ===================== -->
+<aside id="barra-lateral" class="barra-lateral w-[222px] shrink-0 flex flex-col bg-rosa-50 border-r border-rosa-100 overflow-y-auto">
+<a href="#" class="flex items-center gap-3 mx-3 mt-4 mb-3 p-2 rounded-2xl hover:bg-white transition">
+<span class="w-11 h-11 shrink-0 rounded-full bg-white border border-rosa-200 flex items-center justify-center">
+<i class="fa-regular fa-user text-lg"></i>
+</span>
+<span class="min-w-0 flex-1">
+<span class="block font-bold text-sm truncate">Vanessa</span>
+<span class="block text-xs text-gray-600 truncate">vanessa@email.com</span>
+</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+<nav class="px-3 space-y-1" aria-label="Menú del cliente">
+<button id="btn-categorias" type="button" class="item-lateral w-full" aria-haspopup="true" aria-expanded="false" aria-controls="mega-menu">
+<i class="fa-solid fa-bars"></i> Todas las categorías
+</button>
+<a href="#" class="item-lateral "><i class="fa-solid fa-box-open"></i> Mis pedidos</a>
+<a href="#" class="item-lateral "><i class="fa-regular fa-heart"></i> Mis productos favoritos</a>
+<a href="#" class="item-lateral "><i class="fa-regular fa-bookmark"></i> Mi lista de deseos</a>
+<a href="#" class="item-lateral "><i class="fa-solid fa-location-dot"></i> Direcciones</a>
+<a href="#" class="item-lateral "><i class="fa-regular fa-credit-card"></i> Métodos de pago</a>
+<a href="#" class="item-lateral "><i class="fa-solid fa-gear"></i> Configuración de cuenta</a>
+<a href="#" class="item-lateral "><i class="fa-regular fa-circle-question"></i> Ayuda</a>
+<hr class="!my-3 border-rosa-200">
+<a href="#" class="item-lateral "><i class="fa-solid fa-gift"></i> Recompensas y Puntos</a>
+</nav>
+<!-- Banner inferior -->
+<div class="mt-auto p-3 pt-6">
+<div class="rounded-2xl bg-gradient-to-b from-rosa-100 to-rosa-200/70 px-4 py-6 text-center">
+<p class="font-manuscrita text-2xl leading-snug text-rosa-700 -rotate-3">¡Tu belleza,<br>en un solo lugar!</p>
+<i class="fa-regular fa-heart text-rosa-600 text-xl my-3 block"></i>
+<img src="LOGO" alt="" class="w-24 h-24 mx-auto rounded-full object-cover bg-white shadow-sm">
+</div>
+</div>
+</aside>
+<!-- ===================== MENÚ DE CATEGORÍAS ===================== -->
+<div id="mega-menu" class="mega-menu hidden" role="menu" aria-labelledby="btn-categorias">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-6">
+<div class="flex gap-3">
+<span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid fa-palette"></i></span>
+<div>
+<a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">Maquillaje</a>
+<ul class="mt-2 space-y-1.5">
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Ojos</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Rostro</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Labios</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Uñas</a></li>
+</ul>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid fa-spa"></i></span>
+<div>
+<a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">Cuidado de la piel</a>
+<ul class="mt-2 space-y-1.5">
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Limpiadores</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Hidratantes</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Serums</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Protector solar</a></li>
+</ul>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid fa-pump-soap"></i></span>
+<div>
+<a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">Cuidado del cabello</a>
+<ul class="mt-2 space-y-1.5">
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Shampoo</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Acondicionadores</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Aceites y serums</a></li>
+</ul>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid fa-spray-can-sparkles"></i></span>
+<div>
+<a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">Fragancias</a>
+<ul class="mt-2 space-y-1.5">
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Perfumes</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Body mists</a></li>
+</ul>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid fa-paintbrush"></i></span>
+<div>
+<a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">Brochas y accesorios</a>
+<ul class="mt-2 space-y-1.5">
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Brochas</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Esponjas</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Cosmetiqueras</a></li>
+</ul>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid fa-gift"></i></span>
+<div>
+<a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">Sets y regalos</a>
+<ul class="mt-2 space-y-1.5">
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Kits</a></li>
+<li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">Ediciones especiales</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="text-center mt-6 pt-4 border-t border-rosa-100">
+<a href="#" class="text-sm font-medium text-rosa-700 hover:underline" role="menuitem">Ver todo <i class="fa-solid fa-arrow-right text-xs ml-1"></i></a>
+</div>
+</div>
+<!-- ===================== CONTENIDO ===================== -->
+<main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-6 py-6 lg:py-7">
+<!-- Encabezado -->
+<h1 class="font-titulo font-extrabold text-3xl sm:text-[2.35rem] leading-tight">Mi cuenta</h1>
+<p class="mt-1 text-[15px] text-gray-700">Gestiona tus pedidos, direcciones, recompensas y mucho más.</p>
+<!-- Accesos rápidos -->
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mt-5" aria-label="Accesos rápidos">
+<a href="#" class="tarjeta acceso-rapido">
+<span class="circulo-icono w-11 h-11 text-lg"><i class="fa-solid fa-box-open"></i></span>
+<span class="flex-1 min-w-0">
+<span class="block font-bold text-[15px]">Mis pedidos</span>
+<span class="block text-xs text-gray-600 mt-0.5">Revisa y rastrea tus compras</span>
+</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+<a href="#" class="tarjeta acceso-rapido">
+<span class="circulo-icono w-11 h-11 text-lg"><i class="fa-regular fa-heart"></i></span>
+<span class="flex-1 min-w-0">
+<span class="block font-bold text-[15px]">Mis favoritos</span>
+<span class="block text-xs text-gray-600 mt-0.5">10 productos guardados</span>
+</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+<a href="#" class="tarjeta acceso-rapido">
+<span class="circulo-icono w-11 h-11 text-lg"><i class="fa-solid fa-gift"></i></span>
+<span class="flex-1 min-w-0">
+<span class="block font-bold text-[15px]">Recompensas y Puntos</span>
+<span class="block text-sm mt-0.5">120 Puntos</span>
+</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+<a href="#" class="tarjeta acceso-rapido">
+<span class="circulo-icono w-11 h-11 text-lg"><i class="fa-solid fa-location-dot"></i></span>
+<span class="flex-1 min-w-0">
+<span class="block font-bold text-[15px]">Direcciones</span>
+<span class="block text-xs text-gray-600 mt-0.5">Gestiona tus direcciones de envío</span>
+</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+</section>
+<!-- Pedidos recientes -->
+<section class="mt-8" aria-labelledby="titulo-pedidos">
+<div class="flex items-end justify-between gap-4 mb-3">
+<h2 id="titulo-pedidos" class="font-titulo font-bold text-2xl">Pedidos recientes</h2>
+<a href="#" class="ver-mas">Ver todos <i class="fa-solid fa-arrow-right text-xs"></i></a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+<a href="#" class="tarjeta p-3 flex flex-col gap-3">
+<div class="flex gap-3">
+<span class="w-16 h-16 shrink-0 rounded-lg bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center">
+<i class="fa-solid fa-eye text-2xl text-rosa-300"></i>
+</span>
+<span class="text-sm leading-snug pt-1">
+<span class="block font-medium">Maybelline</span>
+<span class="block">Sky High Máscara</span>
+</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span>22 sep. 2025</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</div>
+<span class="block text-center text-sm font-medium rounded-md py-1.5 bg-amber-100 text-amber-800">En camino</span>
+</a>
+<a href="#" class="tarjeta p-3 flex flex-col gap-3">
+<div class="flex gap-3">
+<span class="w-16 h-16 shrink-0 rounded-lg bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center">
+<i class="fa-solid fa-droplet text-2xl text-rosa-300"></i>
+</span>
+<span class="text-sm leading-snug pt-1">
+<span class="block font-medium">Fenty Beauty</span>
+<span class="block">Gloss Bomb</span>
+</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span>15 sep. 2025</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</div>
+<span class="block text-center text-sm font-medium rounded-md py-1.5 bg-rosa-500 text-white">Entregado</span>
+</a>
+<a href="#" class="tarjeta p-3 flex flex-col gap-3">
+<div class="flex gap-3">
+<span class="w-16 h-16 shrink-0 rounded-lg bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center">
+<i class="fa-solid fa-heart text-2xl text-rosa-300"></i>
+</span>
+<span class="text-sm leading-snug pt-1">
+<span class="block font-medium">Rare Beauty</span>
+<span class="block">Rubor líquido</span>
+</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span>15 sep. 2025</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</div>
+<span class="block text-center text-sm font-medium rounded-md py-1.5 bg-rosa-500 text-white">Entregado</span>
+</a>
+<a href="#" class="tarjeta p-3 flex flex-col gap-3">
+<div class="flex gap-3">
+<span class="w-16 h-16 shrink-0 rounded-lg bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center">
+<i class="fa-solid fa-pump-soap text-2xl text-rosa-300"></i>
+</span>
+<span class="text-sm leading-snug pt-1">
+<span class="block font-medium">Kérastase</span>
+<span class="block">Aceite capilar</span>
+</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span>15 sep. 2025</span>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</div>
+<span class="block text-center text-sm font-medium rounded-md py-1.5 bg-rosa-500 text-white">Entregado</span>
+</a>
+</div>
+</section>
+<!-- Recomendaciones + puntos -->
+<section class="mt-8" aria-labelledby="titulo-recomendaciones">
+<div class="flex items-end justify-between gap-4 mb-3">
+<h2 id="titulo-recomendaciones" class="font-titulo font-bold text-2xl">Recomendaciones para ti</h2>
+<a href="#" class="ver-mas">Ver más <i class="fa-solid fa-arrow-right text-xs"></i></a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 items-start">
+<article class="tarjeta flex flex-col p-2.5">
+<div class="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center overflow-hidden">
+<i class="fa-solid fa-wand-magic-sparkles text-5xl text-rosa-300"></i>
+<button type="button" class="btn-favorito absolute top-2 right-2" aria-pressed="true" aria-label="Agregar SuperStay Matte Ink a favoritos">
+<i class="fa-solid fa-heart"></i>
+</button>
+</div>
+<div class="flex-1 flex flex-col px-1.5 pt-3">
+<h3 class="text-[15px] leading-snug">Maybelline<br>SuperStay Matte Ink</h3>
+<div class="flex items-center gap-1 mt-2 text-sm" aria-label="Calificación 4.5 de 5">
+<span class="text-amber-500 text-xs flex gap-0.5">
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star-half-stroke"></i>
+</span>
+<span class="text-gray-600">(124)</span>
+</div>
+<p class="font-bold text-lg mt-1.5">C$ 180.00</p>
+<button type="button" class="btn-carrito mt-3" data-producto="1">
+<i class="fa-solid fa-cart-plus"></i> <span>Agregar al carrito</span>
+</button>
+</div>
+</article>
+<article class="tarjeta flex flex-col p-2.5">
+<div class="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center overflow-hidden">
+<i class="fa-solid fa-circle text-5xl text-rosa-300"></i>
+<button type="button" class="btn-favorito absolute top-2 right-2" aria-pressed="true" aria-label="Agregar Soft Pinch Blush a favoritos">
+<i class="fa-solid fa-heart"></i>
+</button>
+</div>
+<div class="flex-1 flex flex-col px-1.5 pt-3">
+<h3 class="text-[15px] leading-snug">Rare Beauty<br>Soft Pinch Blush</h3>
+<div class="flex items-center gap-1 mt-2 text-sm" aria-label="Calificación 4.5 de 5">
+<span class="text-amber-500 text-xs flex gap-0.5">
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star-half-stroke"></i>
+</span>
+<span class="text-gray-600">(56)</span>
+</div>
+<p class="font-bold text-lg mt-1.5">C$ 430.00</p>
+<button type="button" class="btn-carrito mt-3" data-producto="2">
+<i class="fa-solid fa-cart-plus"></i> <span>Agregar al carrito</span>
+</button>
+</div>
+</article>
+<article class="tarjeta flex flex-col p-2.5">
+<div class="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center overflow-hidden">
+<i class="fa-solid fa-paintbrush text-5xl text-rosa-300"></i>
+<button type="button" class="btn-favorito absolute top-2 right-2" aria-pressed="false" aria-label="Agregar Set de brochas a favoritos">
+<i class="fa-regular fa-heart"></i>
+</button>
+</div>
+<div class="flex-1 flex flex-col px-1.5 pt-3">
+<h3 class="text-[15px] leading-snug">Real Techniques<br>Set de brochas</h3>
+<div class="flex items-center gap-1 mt-2 text-sm" aria-label="Calificación 4.5 de 5">
+<span class="text-amber-500 text-xs flex gap-0.5">
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star-half-stroke"></i>
+</span>
+<span class="text-gray-600">(72)</span>
+</div>
+<p class="font-bold text-lg mt-1.5">C$ 250.00</p>
+<button type="button" class="btn-carrito mt-3" data-producto="3">
+<i class="fa-solid fa-cart-plus"></i> <span>Agregar al carrito</span>
+</button>
+</div>
+</article>
+<article class="tarjeta flex flex-col p-2.5">
+<div class="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center overflow-hidden">
+<i class="fa-solid fa-flask text-5xl text-rosa-300"></i>
+<button type="button" class="btn-favorito absolute top-2 right-2" aria-pressed="false" aria-label="Agregar Hyaluronic Acid Serum a favoritos">
+<i class="fa-regular fa-heart"></i>
+</button>
+</div>
+<div class="flex-1 flex flex-col px-1.5 pt-3">
+<h3 class="text-[15px] leading-snug">The Ordinary<br>Hyaluronic Acid Serum</h3>
+<div class="flex items-center gap-1 mt-2 text-sm" aria-label="Calificación 4.5 de 5">
+<span class="text-amber-500 text-xs flex gap-0.5">
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star"></i>
+<i class="fa-solid fa-star-half-stroke"></i>
+</span>
+<span class="text-gray-600">(58)</span>
+</div>
+<p class="font-bold text-lg mt-1.5">C$ 280.00</p>
+<button type="button" class="btn-carrito mt-3" data-producto="4">
+<i class="fa-solid fa-cart-plus"></i> <span>Agregar al carrito</span>
+</button>
+</div>
+</article>
+<!-- Puntos y recompensas -->
+<aside class="tarjeta p-4 sm:col-span-2 lg:col-span-3 xl:col-span-1" aria-label="Tus puntos y recompensas">
+<h3 class="font-medium text-[17px]">Tus puntos y recompensas</h3>
+<p class="font-medium text-[1.65rem] mt-3">120 Puntos</p>
+<ul class="mt-4 space-y-5">
+<li>
+<div class="flex items-center gap-2.5 text-sm">
+<i class="fa-solid fa-truck-fast w-5 text-center"></i>
+<span>Envío gratis en tu próximo pedido</span>
+</div>
+<div class="barra-progreso mt-2" role="progressbar" aria-valuemin="0" aria-valuemax="150" aria-valuenow="120" aria-label="Envío gratis en tu próximo pedido">
+<span style="width: 80%"></span>
+</div>
+<p class="text-xs text-gray-600 mt-1.5">
+Te faltan 30 puntos
+</p>
+</li>
+<li>
+<div class="flex items-center gap-2.5 text-sm">
+<i class="fa-solid fa-gift w-5 text-center"></i>
+<span>Regalo por 200 puntos</span>
+</div>
+<div class="barra-progreso mt-2" role="progressbar" aria-valuemin="0" aria-valuemax="200" aria-valuenow="120" aria-label="Regalo por 200 puntos">
+<span style="width: 60%"></span>
+</div>
+<p class="text-xs text-gray-600 mt-1.5">
+Te faltan 80 puntos
+</p>
+</li>
+</ul>
+</aside>
+</div>
+</section>
+</main>
+</div>
+<!-- Aviso flotante (ej. "Agregado al carrito") -->
+<div id="aviso" class="aviso" role="status" aria-live="polite"></div>
+<script>/* ==========================================================================
+TIENDA (VISTA CLIENTE) - Interacciones
+Por ahora todo es visual: favoritos y carrito solo cambian en pantalla.
+========================================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+const escritorio = window.matchMedia('(min-width: 1024px)');
+// ---------- Menú lateral (hamburguesa) ----------
+const btnHamburguesa = document.getElementById('btn-hamburguesa');
+const barraLateral = document.getElementById('barra-lateral');
+const fondoMenu = document.getElementById('fondo-menu');
+function cerrarLateralMovil() {
+barraLateral.classList.remove('abierta');
+fondoMenu.classList.add('hidden');
+btnHamburguesa.setAttribute('aria-expanded', 'false');
+}
+if (btnHamburguesa && barraLateral) {
+btnHamburguesa.addEventListener('click', function () {
+let abierto;
+if (escritorio.matches) {
+abierto = !barraLateral.classList.toggle('colapsada');
+} else {
+abierto = barraLateral.classList.toggle('abierta');
+fondoMenu.classList.toggle('hidden', !abierto);
+}
+btnHamburguesa.setAttribute('aria-expanded', String(abierto));
+if (!abierto) cerrarMegaMenu();
+});
+fondoMenu.addEventListener('click', function () {
+cerrarLateralMovil();
+cerrarMegaMenu();
+});
+escritorio.addEventListener('change', cerrarLateralMovil);
+}
+// ---------- Menú de categorías ----------
+const btnCategorias = document.getElementById('btn-categorias');
+const megaMenu = document.getElementById('mega-menu');
+const contenedor = document.getElementById('contenedor-tienda');
+function cerrarMegaMenu() {
+if (!megaMenu) return;
+megaMenu.classList.add('hidden');
+btnCategorias.classList.remove('activo');
+btnCategorias.setAttribute('aria-expanded', 'false');
+}
+function abrirMegaMenu() {
+if (escritorio.matches) {
+// Lo alinea justo debajo del botón "Todas las categorías"
+const arriba = btnCategorias.getBoundingClientRect().bottom - contenedor.getBoundingClientRect().top + 6;
+megaMenu.style.top = arriba + 'px';
+} else {
+megaMenu.style.top = '';
+}
+megaMenu.classList.remove('hidden');
+btnCategorias.classList.add('activo');
+btnCategorias.setAttribute('aria-expanded', 'true');
+}
+if (btnCategorias && megaMenu) {
+btnCategorias.addEventListener('click', function (e) {
+e.stopPropagation();
+megaMenu.classList.contains('hidden') ? abrirMegaMenu() : cerrarMegaMenu();
+});
+megaMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+}
+// ---------- Menú de usuario ----------
+const btnUsuario = document.getElementById('btn-usuario');
+const menuUsuario = document.getElementById('menu-usuario');
+function cerrarMenuUsuario() {
+if (!menuUsuario) return;
+menuUsuario.classList.add('hidden');
+btnUsuario.setAttribute('aria-expanded', 'false');
+}
+if (btnUsuario && menuUsuario) {
+btnUsuario.addEventListener('click', function (e) {
+e.stopPropagation();
+const abrir = menuUsuario.classList.contains('hidden');
+menuUsuario.classList.toggle('hidden', !abrir);
+btnUsuario.setAttribute('aria-expanded', String(abrir));
+});
+menuUsuario.addEventListener('click', function (e) { e.stopPropagation(); });
+}
+// Cerrar menús al hacer clic fuera o con la tecla Escape
+document.addEventListener('click', function () {
+cerrarMegaMenu();
+cerrarMenuUsuario();
+});
+document.addEventListener('keydown', function (e) {
+if (e.key === 'Escape') {
+cerrarMegaMenu();
+cerrarMenuUsuario();
+if (!escritorio.matches) cerrarLateralMovil();
+}
+});
+// ---------- Aviso flotante ----------
+const aviso = document.getElementById('aviso');
+let temporizadorAviso;
+function mostrarAviso(texto) {
+if (!aviso) return;
+aviso.textContent = texto;
+aviso.classList.add('visible');
+clearTimeout(temporizadorAviso);
+temporizadorAviso = setTimeout(() => aviso.classList.remove('visible'), 2200);
+}
+function actualizarContador(id, cambio) {
+const contador = document.getElementById(id);
+if (!contador) return;
+const valor = Math.max(0, (parseInt(contador.textContent, 10) || 0) + cambio);
+contador.textContent = valor;
+contador.classList.remove('salta');
+void contador.offsetWidth; // reinicia la animación
+contador.classList.add('salta');
+}
+// ---------- Favoritos ----------
+document.querySelectorAll('.btn-favorito').forEach(function (boton) {
+boton.addEventListener('click', function () {
+const activo = boton.getAttribute('aria-pressed') !== 'true';
+boton.setAttribute('aria-pressed', String(activo));
+const icono = boton.querySelector('i');
+icono.classList.toggle('fa-solid', activo);
+icono.classList.toggle('fa-regular', !activo);
+actualizarContador('contador-favoritos', activo ? 1 : -1);
+mostrarAviso(activo ? 'Agregado a favoritos' : 'Quitado de favoritos');
+});
+});
+// ---------- Agregar al carrito ----------
+document.querySelectorAll('.btn-carrito').forEach(function (boton) {
+boton.addEventListener('click', function () {
+if (boton.classList.contains('agregado')) return;
+const texto = boton.querySelector('span');
+const original = texto.textContent;
+boton.classList.add('agregado');
+texto.textContent = '¡Agregado!';
+actualizarContador('contador-carrito', 1);
+mostrarAviso('Producto agregado al carrito');
+setTimeout(function () {
+boton.classList.remove('agregado');
+texto.textContent = original;
+}, 1500);
+});
+});
+});
+</script>
+<script>window.__LOGO="data:image/jpeg;base64,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";document.querySelectorAll('img[src="LOGO"]').forEach(i=>i.src=window.__LOGO);</script></body>
+</html>
