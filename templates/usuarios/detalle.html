@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load napo %}
+
+{% block content %}
+<a href="{% url 'usuarios' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a usuarios</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xl font-extrabold">{{ usuario|iniciales }}</div>
+        <div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <h1 class="text-3xl font-extrabold text-gray-800">{{ usuario }}</h1>
+                {% include 'componentes/estado.html' with activo=usuario.activo texto_no='Deshabilitado' %}
+            </div>
+            <p class="text-gray-500 text-sm mt-1">@{{ usuario.nombre_usuario }} · {{ usuario.rol.nombre }}</p>
+        </div>
+    </div>
+    {% if puede_editar %}<a href="{% url 'usuario_editar' usuario.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-bold text-gray-800 mb-4">Datos del usuario</h2>
+        <dl class="space-y-4">
+            {% include 'componentes/dato.html' with etiqueta='Correo' valor=usuario.correo %}
+            {% include 'componentes/dato.html' with etiqueta='Teléfono' valor=usuario.telefono %}
+            {% include 'componentes/dato.html' with etiqueta='Rol' valor=usuario.rol.nombre %}
+            {% include 'componentes/dato.html' with etiqueta='Creado el' valor=usuario.fecha_creacion|date:'d/m/Y' %}
+            {% include 'componentes/dato.html' with etiqueta='Último acceso' valor=usuario.ultimo_acceso|date:'d/m/Y h:i a'|default:'Nunca' %}
+            {% include 'componentes/dato.html' with etiqueta='Ventas registradas' valor=ventas_registradas %}
+        </dl>
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 class="font-bold text-gray-800 mb-1">Permisos del rol {{ usuario.rol.nombre }}</h2>
+        <p class="text-xs text-gray-400 mb-5">Los permisos se asignan al rol: todos los usuarios con este rol tienen los mismos.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for modulo, acciones in permisos.items %}
+            <div class="p-4 rounded-xl border border-gray-100 bg-gray-50/60">
+                <p class="text-sm font-bold text-gray-800 capitalize mb-2">{{ modulo }}</p>
+                <div class="flex flex-wrap gap-1.5">
+                    {% for accion in acciones %}<span class="bg-pink-100 text-pink-700 text-[11px] px-2.5 py-1 rounded-full font-bold">{{ accion }}</span>{% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-400">Este rol no tiene permisos asignados.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
