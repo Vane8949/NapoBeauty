@@ -1,0 +1,5 @@
+{# Botón de "Accesos rápidos". Variables: url, icono, texto (puede llevar <br>), modal #}
+<a href="{{ url }}"{% if modal %} data-modal{% endif %} class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent hover:border-pink-200">
+    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid {{ icono }}"></i></div>
+    <span class="text-[10px] leading-tight text-center font-bold text-gray-700">{{ texto|safe }}</span>
+</a>
