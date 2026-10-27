@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load napo %}
+
+{% block content %}
+<a href="{% url 'proveedores' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a proveedores</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-3xl font-extrabold text-gray-800">{{ proveedor.nombre_empresa }}</h1>
+            {% include 'componentes/estado.html' with activo=proveedor.activo texto_no='Deshabilitado' %}
+        </div>
+        <p class="text-gray-500 text-sm mt-1">Proveedor #{{ proveedor.pk }}{% if proveedor.ruc %} · RUC {{ proveedor.ruc }}{% endif %} · registrado el {{ proveedor.fecha_registro|date:'d/m/Y' }}</p>
+    </div>
+    {% if puede_editar %}<a href="{% url 'proveedor_editar' proveedor.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Contacto</h2>
+            <dl class="space-y-4">
+                {% include 'componentes/dato.html' with etiqueta='Persona de contacto' valor=proveedor.nombre_contacto %}
+                {% include 'componentes/dato.html' with etiqueta='Teléfono' valor=proveedor.telefono %}
+                {% include 'componentes/dato.html' with etiqueta='Correo' valor=proveedor.correo %}
+                {% include 'componentes/dato.html' with etiqueta='Dirección' valor=proveedor.direccion %}
+            </dl>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p class="text-xs text-gray-500">Total comprado</p><h2 class="text-lg font-bold text-gray-800">{{ resumen.total|cordobas }}</h2></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p class="text-xs text-gray-500">Órdenes pendientes</p><h2 class="text-lg font-bold {% if resumen.pendientes %}text-yellow-600{% else %}text-gray-800{% endif %}">{{ resumen.pendientes }}</h2></div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Productos que surte ({{ productos|length }})</h2>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">Producto</th><th class="py-3 px-6">Categoría</th><th class="py-3 px-6 text-right">Costo</th><th class="py-3 px-6 text-center">Stock</th></tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr class="border-b border-gray-50 {% if not p.activo %}opacity-60{% endif %}">
+                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' p.pk %}" class="font-medium text-gray-800 hover:text-pink-600">{{ p.nombre }}</a><p class="text-xs text-gray-400">{{ p.marca.nombre }} · {{ p.sku }}</p></td>
+                        <td class="py-3 px-6 text-gray-500">{{ p.categoria.nombre }}</td>
+                        <td class="py-3 px-6 text-right whitespace-nowrap">{{ p.precio_compra|cordobas }}</td>
+                        <td class="py-3 px-6 text-center {% if p.stock_bajo %}text-yellow-600 font-bold{% endif %}">{{ p.stock_actual }}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=4 texto='Ningún producto tiene a este proveedor como habitual.' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Últimas compras</h2>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">Factura</th><th class="py-3 px-6">Fecha</th><th class="py-3 px-6">Registró</th><th class="py-3 px-6 text-right">Total</th><th class="py-3 px-6 text-center">Estado</th></tr>
+                </thead>
+                <tbody>
+                    {% for c in compras %}
+                    <tr class="border-b border-gray-50 {% if not c.activo %}opacity-60{% endif %}">
+                        <td class="py-3 px-6 font-medium text-gray-800">{{ c.numero_factura|default:'—' }}</td>
+                        <td class="py-3 px-6 text-gray-500 whitespace-nowrap">{{ c.fecha|date:'d/m/Y' }}</td>
+                        <td class="py-3 px-6 text-gray-500">{{ c.usuario }}</td>
+                        <td class="py-3 px-6 text-right font-bold whitespace-nowrap">{{ c.total|cordobas }}</td>
+                        <td class="py-3 px-6 text-center">
+                            {% if not c.activo %}<span class="bg-gray-200 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold">Anulada</span>
+                            {% elif c.estado == 'Pendiente' %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold">Pendiente</span>
+                            {% else %}<span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Recibida</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=5 texto='Sin compras registradas.' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 flex justify-between items-center border-b border-gray-100">
+                <h2 class="font-bold text-gray-800">Devoluciones a este proveedor</h2>
+                <a href="{% url 'devoluciones_proveedor' %}?q={{ proveedor.nombre_empresa|urlencode }}" class="text-sm text-pink-600 hover:underline">Ver todas</a>
+            </div>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">#</th><th class="py-3 px-6">Fecha</th><th class="py-3 px-6">Motivo</th><th class="py-3 px-6">Resolución</th><th class="py-3 px-6 text-center">Estado</th></tr>
+                </thead>
+                <tbody>
+                    {% for d in devoluciones %}
+                    <tr class="border-b border-gray-50 {% if not d.activo %}opacity-60{% endif %}">
+                        <td class="py-3 px-6 font-medium"><a href="{% url 'devolucion_proveedor_detalle' d.pk %}" class="hover:text-pink-600">#{{ d.pk }}</a></td>
+                        <td class="py-3 px-6 text-gray-500 whitespace-nowrap">{{ d.fecha|date:'d/m/Y' }}</td>
+                        <td class="py-3 px-6 text-gray-500">{{ d.get_motivo_display }}</td>
+                        <td class="py-3 px-6 text-gray-500">{{ d.get_resolucion_display }}</td>
+                        <td class="py-3 px-6 text-center">{% include 'devoluciones/estado_proveedor.html' %}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=5 texto='No se le ha devuelto nada a este proveedor.' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
