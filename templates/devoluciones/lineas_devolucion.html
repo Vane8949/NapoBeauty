@@ -1,0 +1,31 @@
+{% load napo %}
+{% comment %}Productos de la venta elegida en "Registrar devolución". Usa form.lineas (DevolucionNuevaForm).{% endcomment %}
+<div class="mt-6">
+    <p class="text-sm font-bold text-gray-800 mb-2">Productos devueltos <span class="text-pink-500">*</span></p>
+    {% if not venta_elegida %}
+    <div class="px-4 py-6 rounded-xl border-2 border-dashed border-gray-200 text-center text-sm text-gray-400">
+        <i class="fa-solid fa-receipt text-2xl text-pink-200 mb-2 block"></i>
+        Elige la venta original para ver sus productos.
+    </div>
+    {% else %}
+    <div class="rounded-xl border border-gray-100 overflow-hidden">
+        <div class="grid grid-cols-[1fr_5.5rem_13rem] gap-3 px-3 py-2 bg-pink-50/60 text-xs font-bold text-gray-500">
+            <span>Producto</span><span>Devuelve</span><span>¿Qué se hace con el producto?</span>
+        </div>
+        <div class="divide-y divide-gray-50">
+            {% for linea in form.lineas %}
+            <div class="grid grid-cols-[1fr_5.5rem_13rem] gap-3 px-3 py-3 items-center {% if linea.disponible <= 0 %}opacity-50{% endif %}">
+                <div>
+                    <p class="text-sm font-medium text-gray-800">{{ linea.detalle.producto.nombre }}</p>
+                    <p class="text-xs text-gray-400">Vendidos: {{ linea.detalle.cantidad }} · {{ linea.detalle.precio_unitario|cordobas }} c/u{% if linea.devueltos %} · ya devueltos: {{ linea.devueltos }}{% endif %}</p>
+                    {% for error in linea.cantidad.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div>{% if linea.disponible > 0 %}{{ linea.cantidad }}{% else %}<span class="text-xs text-gray-400">Ya devuelto</span>{% endif %}</div>
+                <div>{% if linea.disponible > 0 %}{{ linea.destino }}{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <p class="text-xs text-gray-400 mt-2">Si llegó en buen estado, regresa al stock. Si está dañado, se da de baja; si es un defecto del proveedor, se le devuelve a él (solo productos con proveedor asignado). Todo se aplica cuando la devolución se marca como Completada.</p>
+    {% endif %}
+</div>
