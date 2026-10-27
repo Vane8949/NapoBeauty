@@ -487,7 +487,7 @@ class Venta(ModeloConActivo):
         PENDIENTE = 'Pendiente'
         PAGADA = 'Pagada'
         PROCESANDO = 'Procesando'
-        EN_CAMINO = 'En camino'
+        EN_CAMINO = 'En camino', 'En camino'
         ENTREGADO = 'Entregado'
 
     id = models.AutoField(primary_key=True, db_column='VentaId')
@@ -553,17 +553,18 @@ class DetalleVenta(ModeloNapo):
 
 class Devolucion(ModeloConActivo):
     class Motivo(models.TextChoices):
-        DEFECTO = 'Defecto de fábrica'
-        EQUIVOCADO = 'Producto equivocado'
-        DANADO = 'Producto dañado'
-        ALERGIA = 'Alergia o reacción'
-        EXPECTATIVAS = 'No cumplió expectativas'
-        OTRO = 'Otro'
+        # (valor guardado en la base, texto que se muestra)
+        DEFECTO = 'Defecto de fábrica', 'Defecto de fábrica'
+        EQUIVOCADO = 'Producto equivocado', 'Producto equivocado'
+        DANADO = 'Producto dañado', 'Producto dañado'
+        ALERGIA = 'Alergia o reacción', 'Alergia o reacción'
+        EXPECTATIVAS = 'No cumplió expectativas', 'No cumplió expectativas'
+        OTRO = 'Otro', 'Otro'
 
     class TipoResolucion(models.TextChoices):
         REEMBOLSO = 'Reembolso'
         CAMBIO = 'Cambio'
-        CREDITO = 'Crédito en tienda'
+        CREDITO = 'Crédito en tienda', 'Crédito en tienda'
 
     class Estado(models.TextChoices):
         PENDIENTE = 'Pendiente'
@@ -591,18 +592,105 @@ class Devolucion(ModeloConActivo):
 
 
 class DetalleDevolucion(ModeloNapo):
+    class Destino(models.TextChoices):
+        # A dónde va el producto que devolvió el cliente
+        INVENTARIO = 'Inventario', 'Regresa al stock'
+        BAJA = 'Baja', 'Se da de baja (dañado)'
+        PROVEEDOR = 'Proveedor', 'Se devuelve al proveedor'
+
     id = models.AutoField(primary_key=True, db_column='DetalleDevolucionId')
     devolucion = models.ForeignKey(Devolucion, models.PROTECT, db_column='DevolucionId', related_name='detalles')
     detalle_venta = models.ForeignKey(DetalleVenta, models.PROTECT, db_column='DetalleVentaId',
                                       related_name='devoluciones')
     cantidad = models.IntegerField(validators=[MinValueValidator(1)], db_column='Cantidad')
     regresa_a_inventario = models.BooleanField(default=False, db_column='RegresaAInventario')
+    destino = models.CharField(max_length=20, choices=Destino.choices, default=Destino.INVENTARIO,
+                               db_column='Destino')
 
     class Meta:
         managed = False
         db_table = 'DetalleDevolucion'
         verbose_name = 'detalle de devolución'
         verbose_name_plural = 'detalles de devoluciones'
+
+
+class DevolucionProveedor(ModeloConActivo):
+    """Productos que la tienda le regresa a un proveedor (defectuosos, vencidos, pedido equivocado...).
+
+    Origen Inventario: salen del stock al registrarla. Origen Cliente: los devolvió un cliente y
+    nunca volvieron al stock. Activo = 0 significa devolución anulada.
+    """
+
+    class Origen(models.TextChoices):
+        INVENTARIO = 'Inventario', 'Desde el inventario'
+        CLIENTE = 'Cliente', 'Devuelto por un cliente'
+
+    class Motivo(models.TextChoices):
+        DEFECTO = 'Defecto de fábrica', 'Defecto de fábrica'
+        VENCIDO = 'Producto vencido', 'Producto vencido'
+        DANADO = 'Producto dañado', 'Producto dañado'
+        ERROR = 'Error en el pedido', 'Error en el pedido'
+        OTRO = 'Otro', 'Otro'
+
+    class Resolucion(models.TextChoices):
+        REPOSICION = 'Reposición', 'Reposición del producto'
+        NOTA_CREDITO = 'Nota de crédito', 'Nota de crédito'
+        REEMBOLSO = 'Reembolso', 'Reembolso'
+
+    class Estado(models.TextChoices):
+        PENDIENTE = 'Pendiente', 'Pendiente'
+        ENVIADA = 'Enviada', 'Enviada al proveedor'
+        COMPLETADA = 'Completada', 'Completada'
+        RECHAZADA = 'Rechazada', 'Rechazada por el proveedor'
+
+    id = models.AutoField(primary_key=True, db_column='DevolucionProveedorId')
+    proveedor = models.ForeignKey(Proveedor, models.PROTECT, db_column='ProveedorId', related_name='devoluciones')
+    devolucion = models.ForeignKey(Devolucion, models.PROTECT, null=True, blank=True, db_column='DevolucionId',
+                                   related_name='devoluciones_proveedor')
+    usuario = models.ForeignKey(Usuario, models.PROTECT, null=True, blank=True, db_column='UsuarioId',
+                                related_name='devoluciones_proveedor')
+    origen = models.CharField(max_length=20, choices=Origen.choices, default=Origen.INVENTARIO, db_column='Origen')
+    fecha = models.DateTimeField(default=timezone.now, db_column='Fecha')
+    fecha_resolucion = models.DateTimeField(null=True, blank=True, db_column='FechaResolucion')
+    motivo = models.CharField(max_length=40, choices=Motivo.choices, db_column='Motivo')
+    resolucion = models.CharField(max_length=20, choices=Resolucion.choices, default=Resolucion.REPOSICION,
+                                  db_column='Resolucion')
+    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE, db_column='Estado')
+    monto_credito = dinero(12, default=0, validators=[MinValueValidator(0)], db_column='MontoCredito')
+    factura_proveedor = models.CharField(max_length=30, null=True, blank=True, db_column='FacturaProveedor')
+    descripcion = models.CharField(max_length=500, null=True, blank=True, db_column='Descripcion')
+
+    class Meta:
+        managed = False
+        db_table = 'DevolucionProveedor'
+        verbose_name = 'devolución a proveedor'
+        verbose_name_plural = 'devoluciones a proveedores'
+
+    @property
+    def cerrada(self):
+        return self.estado in (self.Estado.COMPLETADA, self.Estado.RECHAZADA)
+
+
+class DetalleDevolucionProveedor(ModeloNapo):
+    id = models.AutoField(primary_key=True, db_column='DetalleDevolucionProveedorId')
+    devolucion_proveedor = models.ForeignKey(DevolucionProveedor, models.PROTECT, db_column='DevolucionProveedorId',
+                                             related_name='detalles')
+    producto = models.ForeignKey(Producto, models.PROTECT, db_column='ProductoId',
+                                 related_name='devoluciones_proveedor')
+    cantidad = models.IntegerField(validators=[MinValueValidator(1)], db_column='Cantidad')
+    costo_unitario = dinero(validators=[MinValueValidator(0)], db_column='CostoUnitario')
+    # Columna calculada en SQL Server: no se escribe, solo se lee
+    subtotal = models.GeneratedField(
+        expression=F('cantidad') * F('costo_unitario'),
+        output_field=models.DecimalField(max_digits=21, decimal_places=2),
+        db_persist=True, db_column='Subtotal',
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'DetalleDevolucionProveedor'
+        verbose_name = 'detalle de devolución a proveedor'
+        verbose_name_plural = 'detalles de devoluciones a proveedores'
 
 
 # =============================================================================
