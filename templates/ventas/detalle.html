@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static napo %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/ventas.css' %}">{% endblock %}
+
+{% block content %}
+<a href="{% url 'ventas' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a ventas</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-3xl font-extrabold text-gray-800">Venta #{{ venta.numero_factura }}</h1>
+            {% include 'ventas/estado_venta.html' with v=venta %}
+        </div>
+        <p class="text-gray-500 text-sm mt-1">{{ venta.fecha|date:'d/m/Y h:i a' }} · {{ venta.get_canal_display }}</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'venta_recibo' venta.pk %}" class="bg-white border border-pink-200 text-pink-600 hover:bg-pink-50 px-4 py-2.5 rounded-xl font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Recibo</a>
+        {% if puede_devolver %}<a href="{% url 'devolucion_crear' %}?venta={{ venta.pk }}" data-modal class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-arrow-rotate-left"></i> Registrar devolución</a>{% endif %}
+        {% if puede_editar %}<a href="{% url 'venta_editar' venta.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+    </div>
+</div>
+
+{% if not venta.activo %}
+<div class="mb-6 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-600 text-sm"><i class="fa-solid fa-ban mr-2"></i>Esta venta está anulada: no cuenta en los reportes y sus productos regresaron al inventario.</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Productos -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Productos</h2>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">Producto</th><th class="py-3 px-6 text-center">Cantidad</th><th class="py-3 px-6 text-right">Precio</th><th class="py-3 px-6 text-right">Descuento</th><th class="py-3 px-6 text-right">Subtotal</th></tr>
+                </thead>
+                <tbody>
+                    {% for d in detalles %}
+                    <tr class="border-b border-gray-50">
+                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.producto.nombre }}</a><p class="text-xs text-gray-400">{{ d.producto.marca.nombre }} · {{ d.producto.sku }}</p></td>
+                        <td class="py-3 px-6 text-center">{{ d.cantidad }}</td>
+                        <td class="py-3 px-6 text-right whitespace-nowrap">{{ d.precio_unitario|cordobas }}</td>
+                        <td class="py-3 px-6 text-right whitespace-nowrap text-gray-500">{% if d.descuento %}−{{ d.descuento|cordobas }}{% else %}—{% endif %}</td>
+                        <td class="py-3 px-6 text-right font-bold whitespace-nowrap">{{ d.subtotal|cordobas }}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=5 texto='Esta venta no tiene productos.' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            <dl class="px-6 py-4 border-t border-gray-100 text-sm space-y-1.5 ml-auto max-w-xs">
+                <div class="flex justify-between"><dt class="text-gray-500">Subtotal</dt><dd>{{ venta.subtotal|cordobas }}</dd></div>
+                {% if venta.descuento %}<div class="flex justify-between"><dt class="text-gray-500">Descuento</dt><dd>−{{ venta.descuento|cordobas }}</dd></div>{% endif %}
+                {% if venta.impuesto %}<div class="flex justify-between"><dt class="text-gray-500">IVA</dt><dd>{{ venta.impuesto|cordobas }}</dd></div>{% endif %}
+                {% if venta.costo_envio %}<div class="flex justify-between"><dt class="text-gray-500">Envío</dt><dd>{{ venta.costo_envio|cordobas }}</dd></div>{% endif %}
+                <div class="flex justify-between pt-2 border-t border-gray-100 text-base font-extrabold text-gray-900"><dt>Total</dt><dd>{{ venta.total|cordobas }}</dd></div>
+            </dl>
+        </div>
+
+        <!-- Devoluciones -->
+        {% if devoluciones %}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Devoluciones de esta venta</h2>
+            <ul class="divide-y divide-gray-50">
+                {% for d in devoluciones %}
+                <li class="px-6 py-3 flex justify-between items-center text-sm">
+                    <a href="{% url 'devolucion_detalle' d.pk %}" class="font-medium text-gray-800 hover:text-pink-600">#{{ d.pk }} · {{ d.get_motivo_display }}</a>
+                    <span class="text-gray-500">{{ d.get_estado_display }} · {{ d.get_tipo_resolucion_display }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Datos de la venta -->
+    <div class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Cliente</h2>
+            {% if venta.cliente %}
+            <a href="{% url 'cliente_detalle' venta.cliente_id %}" class="font-bold text-gray-800 hover:text-pink-600">{{ venta.cliente }}</a>
+            <p class="text-sm text-gray-500">{{ venta.cliente.correo|default:'' }}</p>
+            <p class="text-sm text-gray-500">{{ venta.cliente.telefono|default:'' }}</p>
+            {% else %}
+            <p class="text-sm text-gray-400">Cliente de mostrador</p>
+            {% endif %}
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Pago y entrega</h2>
+            <dl class="space-y-4">
+                {% include 'componentes/dato.html' with etiqueta='Método de pago' valor=venta.metodo_pago.nombre %}
+                {% include 'componentes/dato.html' with etiqueta='Atendió' valor=venta.usuario|default:'Pedido en línea' %}
+                {% if venta.canal == 'En linea' %}{% include 'componentes/dato.html' with etiqueta='Dirección de envío' valor=venta.direccion_envio %}{% endif %}
+                {% if venta.cliente %}{% include 'componentes/dato.html' with etiqueta='Puntos ganados' valor=venta.puntos_ganados %}{% endif %}
+                {% if venta.puntos_canjeados %}{% include 'componentes/dato.html' with etiqueta='Puntos canjeados' valor=venta.puntos_canjeados %}{% endif %}
+                {% include 'componentes/dato.html' with etiqueta='Notas' valor=venta.notas %}
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}
