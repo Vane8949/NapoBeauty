@@ -16,7 +16,7 @@ Este diagrama se ve como imagen en GitHub y en VS Code (con la extensión
 | Clientes | Cliente, DireccionCliente, MetodoPagoCliente | Clientes, Mi cuenta, Direcciones, Métodos de pago |
 | Vista cliente | Favorito, ListaDeseo, CarritoItem, Resena | Favoritos, Lista de deseos, Carrito, estrellas |
 | Ventas | MetodoPago, Venta, DetalleVenta | Ventas, Mis pedidos, Dashboard |
-| Devoluciones | Devolucion, DetalleDevolucion | Devoluciones |
+| Devoluciones | Devolucion, DetalleDevolucion, DevolucionProveedor, DetalleDevolucionProveedor | Devoluciones (de clientes y a proveedores) |
 | Puntos | Recompensa, MovimientoPuntos | Recompensas y Puntos |
 | Reportes (vistas) | vw_StockBajo, vw_VentasPorDia, vw_ProductosMasVendidos, vw_CalificacionProducto, vw_ResumenCliente | Dashboard, Reportes |
 
@@ -63,6 +63,10 @@ erDiagram
     Venta ||--o{ Devolucion : "genera"
     Devolucion ||--|{ DetalleDevolucion : "incluye"
     DetalleVenta ||--o{ DetalleDevolucion : "devuelto en"
+    Proveedor ||--o{ DevolucionProveedor : "recibe"
+    Devolucion ||--o{ DevolucionProveedor : "se envía en"
+    DevolucionProveedor ||--|{ DetalleDevolucionProveedor : "incluye"
+    Producto ||--o{ DetalleDevolucionProveedor : "devuelto en"
 
     Cliente ||--o{ MovimientoPuntos : "acumula"
     Venta |o--o{ MovimientoPuntos : "otorga"
@@ -229,6 +233,25 @@ erDiagram
         int DetalleVentaId FK
         int Cantidad
         bit RegresaAInventario
+        nvarchar Destino
+    }
+    DevolucionProveedor {
+        int DevolucionProveedorId PK
+        int ProveedorId FK
+        int DevolucionId FK
+        int UsuarioId FK
+        nvarchar Origen
+        nvarchar Motivo
+        nvarchar Resolucion
+        nvarchar Estado
+        decimal MontoCredito
+    }
+    DetalleDevolucionProveedor {
+        int DetalleDevolucionProveedorId PK
+        int DevolucionProveedorId FK
+        int ProductoId FK
+        int Cantidad
+        decimal CostoUnitario
     }
     Recompensa {
         int RecompensaId PK
