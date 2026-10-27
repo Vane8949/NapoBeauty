@@ -1,0 +1,7 @@
+{# Píldora del estado de una venta. Variable: v #}
+{% if not v.activo %}<span class="badge badge-neutro whitespace-nowrap">Anulada</span>
+{% elif v.estado == 'Entregado' %}<span class="badge badge-exito whitespace-nowrap">Entregado</span>
+{% elif v.estado == 'Pagada' %}<span class="badge whitespace-nowrap bg-blue-100 text-blue-700">Pagada</span>
+{% elif v.estado == 'En camino' %}<span class="badge whitespace-nowrap bg-purple-100 text-purple-700">En camino</span>
+{% elif v.estado == 'Procesando' %}<span class="badge whitespace-nowrap bg-sky-100 text-sky-700">Procesando</span>
+{% else %}<span class="badge badge-pendiente whitespace-nowrap">{{ v.get_estado_display }}</span>{% endif %}
