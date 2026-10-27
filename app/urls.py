@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from .Rutas import dashboard, productos, inventario, ventas, devoluciones, clientes, proveedores, reportes, usuarios, configuracion, auth
 
 urlpatterns = [
@@ -18,4 +18,7 @@ urlpatterns = [
     path('reportes/', reportes.panel_reportes, name='reportes'),
     path('usuarios/', usuarios.panel_usuarios, name='usuarios'),
     path('configuracion/', configuracion.panel_configuracion, name='configuracion'),
+    
+    # ===== Vista cliente (tienda) -> app/Rutas/cliente/urls.py =====
+    path('cliente/', include('app.Rutas.cliente.urls')),
 ]
