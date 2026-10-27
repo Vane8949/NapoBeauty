@@ -1,0 +1,5 @@
+{# Un dato de la ficha de detalle. Uso: {% include 'componentes/dato.html' with etiqueta='SKU' valor=producto.sku %} #}
+<div>
+    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ etiqueta }}</dt>
+    <dd class="mt-1 text-sm text-gray-800 font-medium break-words">{% if valor or valor == 0 %}{{ valor }}{% else %}<span class="text-gray-300">—</span>{% endif %}</dd>
+</div>
