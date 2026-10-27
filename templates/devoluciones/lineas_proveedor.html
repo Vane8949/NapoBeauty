@@ -1,0 +1,30 @@
+{% load napo %}
+{% comment %}Productos de "Devolver a proveedor". Usa el mismo bloque de líneas que "Registrar venta" (static/js/modales.js), con el precio de compra.{% endcomment %}
+<div class="mt-6" data-lineas data-prefijo="{{ lineas.prefix }}">
+    {{ lineas.management_form }}
+    <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-800">Productos que se devuelven <span class="text-pink-500">*</span></p>
+        <button type="button" data-agregar-linea class="text-sm font-bold text-pink-600 hover:text-pink-700 inline-flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Agregar producto</button>
+    </div>
+
+    {% if lineas.non_form_errors %}
+    <div class="mb-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+        {% for error in lineas.non_form_errors %}<p><i class="fa-solid fa-circle-exclamation mr-2"></i>{{ error }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="rounded-xl border border-gray-100 overflow-hidden">
+        <div class="hidden sm:grid grid-cols-[1fr_6rem_7rem_2.5rem] gap-3 px-3 py-2 bg-pink-50/60 text-xs font-bold text-gray-500">
+            <span>Producto</span><span>Cantidad</span><span class="text-right">Al costo</span><span></span>
+        </div>
+        <div data-lista-lineas class="divide-y divide-gray-50">
+            {% for linea in lineas %}{% include 'ventas/linea_venta.html' %}{% endfor %}
+        </div>
+    </div>
+    <template data-plantilla-linea>{% include 'ventas/linea_venta.html' with linea=lineas.empty_form %}</template>
+
+    <dl class="mt-4 ml-auto max-w-xs text-sm space-y-1">
+        <div class="flex justify-between pt-2 border-t border-gray-100 text-lg font-extrabold text-gray-900"><dt>Total al costo</dt><dd data-total>C$ 0.00</dd></div>
+    </dl>
+    <p class="text-xs text-gray-400 mt-2">{% if form.proveedor.value %}Primero aparecen los productos de este proveedor. {% endif %}Las unidades salen del inventario al registrar la devolución; si el proveedor las repone, vuelven a entrar al completarla.</p>
+</div>
