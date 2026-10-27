@@ -1,0 +1,15 @@
+{# Avisos de "guardado", "sin permiso", etc. (django.contrib.messages) #}
+{% if messages %}
+<div class="space-y-2 mb-6">
+    {% for mensaje in messages %}
+    <div class="flex items-start gap-3 px-4 py-3 rounded-xl border text-sm font-medium
+        {% if mensaje.tags == 'success' %}bg-green-50 border-green-200 text-green-700
+        {% elif mensaje.tags == 'error' %}bg-red-50 border-red-200 text-red-700
+        {% elif mensaje.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-700
+        {% else %}bg-blue-50 border-blue-200 text-blue-700{% endif %}" role="status">
+        <i class="mt-0.5 fa-solid {% if mensaje.tags == 'success' %}fa-circle-check{% elif mensaje.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-info{% endif %}"></i>
+        <span>{{ mensaje }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
