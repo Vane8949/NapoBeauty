@@ -1,0 +1,5 @@
+{# Pestañas de Devoluciones: de clientes / a proveedores. Variable: pestana ('clientes' | 'proveedores') #}
+<div class="flex gap-1 mb-6 border-b border-gray-200">
+    <a href="{% url 'devoluciones' %}" class="px-4 py-2.5 text-sm font-bold border-b-2 -mb-px inline-flex items-center gap-2 {% if pestana == 'proveedores' %}border-transparent text-gray-500 hover:text-pink-600{% else %}border-pink-500 text-pink-600{% endif %}"><i class="fa-solid fa-user"></i> De clientes</a>
+    <a href="{% url 'devoluciones_proveedor' %}" class="px-4 py-2.5 text-sm font-bold border-b-2 -mb-px inline-flex items-center gap-2 {% if pestana == 'proveedores' %}border-pink-500 text-pink-600{% else %}border-transparent text-gray-500 hover:text-pink-600{% endif %}"><i class="fa-solid fa-truck-ramp-box"></i> A proveedores</a>
+</div>
