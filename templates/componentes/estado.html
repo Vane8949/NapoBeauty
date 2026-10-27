@@ -1,0 +1,6 @@
+{# Píldora Activo / Inactivo. Uso: {% include 'componentes/estado.html' with activo=obj.activo %} #}
+{% if activo %}
+<span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ texto_si|default:'Activo' }}</span>
+{% else %}
+<span class="bg-gray-200 text-gray-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ texto_no|default:'Inactivo' }}</span>
+{% endif %}
