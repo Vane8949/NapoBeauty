@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static napo %}
 
 {% block extra_css %}
 <!-- CSS exclusivo de Ventas -->
@@ -12,10 +12,10 @@
         <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Ventas</h1>
         <p class="text-gray-600 text-sm">Gestiona y monitorea las ventas, pedidos y transacciones</p>
     </div>
-    
+
     <div class="flex flex-col sm:flex-row items-center gap-4">
         <div class="flex flex-col gap-2">
-            <button class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Registrar Venta</button>
+            {% if puede_crear %}<a href="{% url 'venta_crear' %}" data-modal class="btn-oscuro w-full justify-center"><i class="fa-solid fa-plus"></i> Registrar Venta</a>{% endif %}
             <button class="btn-secundario w-full justify-center"><i class="fa-solid fa-download"></i> Exportar Historial</button>
         </div>
     </div>
@@ -26,39 +26,57 @@
         <div class="tarjeta-icono bg-[#FBCFE8] text-[#D81B60]"><i class="fa-solid fa-money-bill-wave"></i></div>
         <div>
             <p class="text-xs text-gray-700 font-medium mb-0.5">Total Ventas de Hoy</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">C$ 12,450.00</h2>
+            <h2 class="text-2xl font-extrabold text-gray-900 whitespace-nowrap">{{ kpi.hoy|cordobas }}</h2>
         </div>
     </div>
     <div class="tarjeta-kpi bg-[#F3E8FF] border-[#E9D5FF]">
         <div class="tarjeta-icono bg-[#E9D5FF] text-[#7E22CE]"><i class="fa-solid fa-cart-shopping"></i></div>
         <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Pedidos del Mes</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">248 Pedidos</h2>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Ventas del Mes</p>
+            <h2 class="text-2xl font-extrabold text-gray-900 whitespace-nowrap">{{ kpi.pedidos_mes }} venta{{ kpi.pedidos_mes|pluralize }}</h2>
         </div>
     </div>
     <div class="tarjeta-kpi bg-[#FCE7F3] border-[#FBCFE8]">
         <div class="tarjeta-icono bg-[#FBCFE8] text-[#BE185D]"><i class="fa-solid fa-arrow-trend-up"></i></div>
         <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Ventas Mensuales</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">C$ 184,320.00</h2>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Monto del Mes</p>
+            <h2 class="text-2xl font-extrabold text-gray-900 whitespace-nowrap">{{ kpi.monto_mes|cordobas }}</h2>
         </div>
     </div>
     <div class="tarjeta-kpi bg-[#FEF3C7] border-[#FDE68A]">
         <div class="tarjeta-icono bg-[#FDE68A] text-[#B45309]"><i class="fa-solid fa-ticket"></i></div>
         <div>
-            <p class="text-xs text-gray-700 font-medium mb-0.5">Ticket Promedio</p>
-            <h2 class="text-2xl font-extrabold text-gray-900">C$ 743.00</h2>
+            <p class="text-xs text-gray-700 font-medium mb-0.5">Ticket Promedio (mes)</p>
+            <h2 class="text-2xl font-extrabold text-gray-900 whitespace-nowrap">{{ kpi.ticket|cordobas }}</h2>
         </div>
     </div>
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <form method="get" class="p-4 border-b border-gray-100 flex flex-wrap gap-3 justify-between items-center">
+        <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar por factura o cliente..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <select name="canal" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los canales</option>
+                {% for valor, nombre in canales %}<option value="{{ valor }}" {% if canal == valor %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+            </select>
+            <select name="estado" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los estados</option>
+                {% for valor, nombre in estados %}<option value="{{ valor }}" {% if estado == valor %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+                <option value="anuladas" {% if estado == 'anuladas' %}selected{% endif %}>Anuladas</option>
+            </select>
+            {% if busqueda %}<a href="{% url 'ventas' %}" class="px-3 py-2 text-sm text-gray-500 hover:text-pink-600">Limpiar</a>{% endif %}
+        </div>
+    </form>
+
     <div class="overflow-x-auto">
         <table class="tabla-napo">
             <thead>
                 <tr>
-                    <th class="w-12 text-center"><input type="checkbox" class="rounded accent-pink-500"></th>
-                    <th>ID Venta</th>
+                    <th>Factura</th>
                     <th>Cliente</th>
                     <th>Fecha y Hora</th>
                     <th>Método de Pago</th>
@@ -68,34 +86,31 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td class="font-bold text-gray-600">#V-1024</td>
-                    <td><p class="font-bold text-gray-800">Ana Garvie</p><p class="text-xs text-gray-500">anagarvie@gmail.com</p></td>
-                    <td>17/04/2025 10:15 am</td>
-                    <td><span class="badge-pago"><i class="fa-solid fa-money-bill-transfer"></i> Transferencia</span></td>
-                    <td class="font-bold text-gray-900">C$ 820.00</td>
-                    <td><span class="badge badge-exito">Completada</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
+                {% for v in pagina %}
+                <tr class="{% if not v.activo %}opacity-60{% endif %}">
+                    <td>
+                        <a href="{% url 'venta_detalle' v.pk %}" class="font-bold text-gray-600 hover:text-pink-600">#{{ v.numero_factura }}</a>
+                        <p class="text-xs text-gray-400">{{ v.get_canal_display }}</p>
+                    </td>
+                    <td>
+                        {% if v.cliente %}<p class="font-bold text-gray-800">{{ v.cliente }}</p><p class="text-xs text-gray-500">{{ v.cliente.correo|default:v.cliente.telefono|default:'' }}</p>
+                        {% else %}<p class="text-gray-400">Cliente de mostrador</p>{% endif %}
+                    </td>
+                    <td class="whitespace-nowrap">{{ v.fecha|date:'d/m/Y h:i a' }}</td>
+                    <td><span class="badge-pago"><i class="fa-solid {% if v.metodo_pago.nombre == 'Tarjeta' %}fa-credit-card{% elif v.metodo_pago.nombre == 'Transferencia' %}fa-money-bill-transfer{% else %}fa-money-bill{% endif %}"></i> {{ v.metodo_pago.nombre }}</span></td>
+                    <td class="font-bold text-gray-900 whitespace-nowrap">{{ v.total|cordobas }}</td>
+                    <td>{% include 'ventas/estado_venta.html' %}</td>
+                    <td class="text-center">
+                        {% url 'venta_detalle' v.pk as url_ver %}{% url 'venta_editar' v.pk as url_editar %}
+                        {% if puede_editar %}{% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %}{% else %}{% include 'componentes/acciones.html' with ver=url_ver %}{% endif %}
                     </td>
                 </tr>
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="rounded accent-pink-500"></td>
-                    <td class="font-bold text-gray-600">#V-1022</td>
-                    <td><p class="font-bold text-gray-800">Daniela Pérez</p><p class="text-xs text-gray-500">danielaperez@gmail.com</p></td>
-                    <td>17/04/2025 10:15 am</td>
-                    <td><span class="badge-pago"><i class="fa-solid fa-credit-card"></i> Tarjeta</span></td>
-                    <td class="font-bold text-gray-900">C$ 1,240.00</td>
-                    <td><span class="badge badge-pendiente">Pendiente de Pago</span></td>
-                    <td class="text-center text-gray-400 gap-2 flex justify-center mt-2">
-                        <button class="hover:text-napo-primary"><i class="fa-solid fa-pen"></i></button>
-                        <button class="hover:text-napo-primary"><i class="fa-regular fa-eye"></i></button>
-                    </td>
-                </tr>
+                {% empty %}
+                {% include 'componentes/fila_vacia.html' with columnas=7 texto='Todavía no hay ventas registradas.' %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
+    {% include 'componentes/paginacion.html' %}
 </div>
 {% endblock %}
