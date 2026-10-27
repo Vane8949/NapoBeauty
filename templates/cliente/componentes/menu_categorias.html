@@ -1,0 +1,21 @@
+{# Menú desplegable de "Todas las categorías". Usa la lista 'categorias' del contexto. #}
+<div id="mega-menu" class="mega-menu hidden" role="menu" aria-labelledby="btn-categorias">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-6">
+        {% for categoria in categorias %}
+        <div class="flex gap-3">
+            <span class="circulo-icono w-11 h-11 text-base"><i class="fa-solid {{ categoria.icono }}"></i></span>
+            <div>
+                <a href="#" class="block font-bold text-[15px] leading-tight hover:text-rosa-600" role="menuitem">{{ categoria.nombre }}</a>
+                <ul class="mt-2 space-y-1.5">
+                    {% for sub in categoria.subcategorias %}
+                    <li><a href="#" class="text-sm text-gray-700 hover:text-rosa-600" role="menuitem">{{ sub }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-6 pt-4 border-t border-rosa-100">
+        <a href="#" class="text-sm font-medium text-rosa-700 hover:underline" role="menuitem">Ver todo <i class="fa-solid fa-arrow-right text-xs ml-1"></i></a>
+    </div>
+</div>
