@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load napo %}
+
+{% block content %}
+<a href="{% url 'clientes' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a clientes</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-xl font-extrabold">{{ cliente|iniciales }}</div>
+        <div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <h1 class="text-3xl font-extrabold text-gray-800">{{ cliente }}</h1>
+                {% include 'componentes/estado.html' with activo=cliente.activo texto_no='Deshabilitado' %}
+            </div>
+            <p class="text-gray-500 text-sm mt-1">Cliente #{{ cliente.pk }} · desde el {{ cliente.fecha_registro|date:'d/m/Y' }}{% if cliente.contrasena_hash %} · con cuenta en la tienda en línea{% endif %}</p>
+        </div>
+    </div>
+    {% if puede_editar %}<a href="{% url 'cliente_editar' cliente.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p class="text-xs text-gray-500">Compras</p><h2 class="text-2xl font-bold text-gray-800">{{ cliente.compras }}</h2></div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p class="text-xs text-gray-500">Total invertido</p><h2 class="text-2xl font-bold text-gray-800">{{ cliente.total_comprado|cordobas }}</h2></div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p class="text-xs text-gray-500">Puntos disponibles</p><h2 class="text-2xl font-bold text-purple-600">{{ cliente.puntos_disponibles }}</h2></div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100"><p class="text-xs text-gray-500">Productos favoritos</p><h2 class="text-2xl font-bold text-gray-800">{{ favoritos }}</h2></div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Datos de contacto</h2>
+            <dl class="space-y-4">
+                {% include 'componentes/dato.html' with etiqueta='Correo' valor=cliente.correo %}
+                {% include 'componentes/dato.html' with etiqueta='Teléfono' valor=cliente.telefono %}
+                {% include 'componentes/dato.html' with etiqueta='Fecha de nacimiento' valor=cliente.fecha_nacimiento|date:'d/m/Y' %}
+                {% include 'componentes/dato.html' with etiqueta='Última compra' valor=cliente.ultima_compra|date:'d/m/Y' %}
+            </dl>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Direcciones</h2>
+            {% for d in direcciones %}
+            <div class="text-sm {% if not forloop.last %}mb-4 pb-4 border-b border-gray-100{% endif %}">
+                <p class="font-bold text-gray-800">{{ d.alias }}{% if d.es_predeterminada %} <span class="text-[10px] bg-pink-100 text-pink-600 px-2 py-0.5 rounded-full ml-1">Predeterminada</span>{% endif %}</p>
+                <p class="text-gray-500">{{ d.direccion_exacta }}</p>
+                <p class="text-gray-500">{{ d.municipio }}, {{ d.departamento }}</p>
+                <p class="text-gray-400 text-xs">Recibe: {{ d.nombre_recibe }} · {{ d.telefono }}</p>
+            </div>
+            {% empty %}<p class="text-sm text-gray-400">Sin direcciones registradas.</p>{% endfor %}
+        </div>
+    </div>
+
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Últimas compras</h2>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">Factura</th><th class="py-3 px-6">Fecha</th><th class="py-3 px-6">Método</th><th class="py-3 px-6 text-right">Total</th><th class="py-3 px-6 text-center">Estado</th></tr>
+                </thead>
+                <tbody>
+                    {% for v in ventas %}
+                    <tr class="border-b border-gray-50 {% if not v.activo %}opacity-60{% endif %}">
+                        <td class="py-3 px-6"><a href="{% url 'venta_detalle' v.pk %}" class="font-medium text-gray-800 hover:text-pink-600">#{{ v.numero_factura }}</a></td>
+                        <td class="py-3 px-6 text-gray-500 whitespace-nowrap">{{ v.fecha|date:'d/m/Y' }}</td>
+                        <td class="py-3 px-6 text-gray-500">{{ v.metodo_pago.nombre }}</td>
+                        <td class="py-3 px-6 text-right font-bold whitespace-nowrap">{{ v.total|cordobas }}</td>
+                        <td class="py-3 px-6 text-center">{% include 'ventas/estado_venta.html' %}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=5 texto='Este cliente aún no ha comprado.' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Historial de puntos</h2>
+            <ul class="divide-y divide-gray-50">
+                {% for m in movimientos_puntos %}
+                <li class="px-6 py-3 flex justify-between items-center text-sm">
+                    <span><span class="font-medium text-gray-800">{{ m.descripcion|default:m.get_tipo_display }}</span><span class="block text-xs text-gray-400">{{ m.fecha|date:'d/m/Y' }} · {{ m.get_tipo_display }}</span></span>
+                    <span class="font-bold {% if m.puntos > 0 %}text-green-600{% else %}text-red-500{% endif %}">{% if m.puntos > 0 %}+{% endif %}{{ m.puntos }}</span>
+                </li>
+                {% empty %}<li class="px-6 py-6 text-sm text-gray-400 text-center">Sin movimientos de puntos.</li>{% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
