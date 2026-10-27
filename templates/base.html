@@ -35,16 +35,16 @@
 
             <nav class="p-4 space-y-1">
                 <!-- Elementos del menú -->
-                <a href="{% url 'dashboard' %}" class="menu-item"><i class="fa-solid fa-house w-5 text-center"></i> Dashboard</a>
-                <a href="{% url 'productos' %}" class="menu-item"><i class="fa-solid fa-box w-5 text-center"></i> Productos</a>
-                <a href="{% url 'inventario' %}" class="menu-item"><i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Inventario</a>
-                <a href="{% url 'ventas' %}" class="menu-item"><i class="fa-solid fa-cart-shopping w-5 text-center"></i> Ventas</a>
-                <a href="{% url 'devoluciones' %}" class="menu-item"><i class="fa-solid fa-arrow-rotate-left w-5 text-center"></i> Devoluciones</a>
-                <a href="{% url 'clientes' %}" class="menu-item"><i class="fa-regular fa-user w-5 text-center"></i> Clientes</a>
-                <a href="{% url 'proveedores' %}" class="menu-item"><i class="fa-solid fa-truck-fast w-5 text-center"></i> Proveedores</a>
-                <a href="{% url 'reportes' %}" class="menu-item"><i class="fa-solid fa-chart-column w-5 text-center"></i> Reportes</a>
-                <a href="{% url 'usuarios' %}" class="menu-item"><i class="fa-solid fa-users w-5 text-center"></i> Usuarios</a>
-                <a href="{% url 'configuracion' %}" class="menu-item"><i class="fa-solid fa-gear w-5 text-center"></i> Configuración</a>
+                <a href="{% url 'dashboard' %}" class="menu-item{% if seccion == 'dashboard' %} activo{% endif %}"><i class="fa-solid fa-house w-5 text-center"></i> Dashboard</a>
+                <a href="{% url 'productos' %}" class="menu-item{% if seccion == 'productos' %} activo{% endif %}"><i class="fa-solid fa-box w-5 text-center"></i> Productos</a>
+                <a href="{% url 'inventario' %}" class="menu-item{% if seccion == 'inventario' %} activo{% endif %}"><i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Inventario</a>
+                <a href="{% url 'ventas' %}" class="menu-item{% if seccion == 'ventas' %} activo{% endif %}"><i class="fa-solid fa-cart-shopping w-5 text-center"></i> Ventas</a>
+                <a href="{% url 'devoluciones' %}" class="menu-item{% if seccion == 'devoluciones' %} activo{% endif %}"><i class="fa-solid fa-arrow-rotate-left w-5 text-center"></i> Devoluciones</a>
+                <a href="{% url 'clientes' %}" class="menu-item{% if seccion == 'clientes' %} activo{% endif %}"><i class="fa-regular fa-user w-5 text-center"></i> Clientes</a>
+                <a href="{% url 'proveedores' %}" class="menu-item{% if seccion == 'proveedores' %} activo{% endif %}"><i class="fa-solid fa-truck-fast w-5 text-center"></i> Proveedores</a>
+                <a href="{% url 'reportes' %}" class="menu-item{% if seccion == 'reportes' %} activo{% endif %}"><i class="fa-solid fa-chart-column w-5 text-center"></i> Reportes</a>
+                <a href="{% url 'usuarios' %}" class="menu-item{% if seccion == 'usuarios' %} activo{% endif %}"><i class="fa-solid fa-users w-5 text-center"></i> Usuarios</a>
+                <a href="{% url 'configuracion' %}" class="menu-item{% if seccion == 'configuracion' %} activo{% endif %}"><i class="fa-solid fa-gear w-5 text-center"></i> Configuración</a>
             </nav>
         </div>
 
@@ -76,12 +76,13 @@
                 </div>
                 <div class="flex items-center gap-3 cursor-pointer">
                     <div class="w-9 h-9 rounded-full bg-pink-200 flex items-center justify-center text-napo-text font-bold"><i class="fa-solid fa-user"></i></div>
-                    <span class="text-sm font-bold text-gray-700">Administrador <i class="fa-solid fa-chevron-down text-xs text-gray-400 ml-1"></i></span>
+                    <span class="text-sm font-bold text-gray-700">{{ nombre_panel }} <i class="fa-solid fa-chevron-down text-xs text-gray-400 ml-1"></i></span>
                 </div>
             </div>
         </header>
 
         <main class="flex-1 overflow-y-auto p-8">
+            {% include 'componentes/mensajes.html' %}
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -104,6 +105,12 @@
         </div>
     </div>
     <!-- ======================================================= -->
+
+    <!-- ================= VENTANA EMERGENTE DE AGREGAR / EDITAR ================= -->
+    <div id="modal-dinamico" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+        <div id="modal-dinamico-contenido" class="w-full flex justify-center"></div>
+    </div>
+    <script src="{% static 'js/modales.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>
