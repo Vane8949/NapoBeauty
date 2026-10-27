@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Tienda{% endblock %} | Napo Beauty</title>
+
+    <!-- Tipografías: títulos (Playfair Display), texto (Roboto), frase del banner (Dancing Script) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@700;800&family=Roboto:wght@400;500;700&display=swap">
+
+    <!-- Librerías externas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'cliente/js/cliente-config.js' %}"></script>
+
+    <!-- Estilos de la tienda -->
+    <link rel="stylesheet" href="{% static 'cliente/css/cliente.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="font-cuerpo text-tinta bg-white antialiased">
+
+    {% include 'cliente/componentes/cabecera.html' %}
+
+    <div id="contenedor-cliente" class="relative flex min-h-[calc(100vh-4rem)]">
+        <!-- Fondo oscuro cuando el menú lateral está abierto en móvil -->
+        <div id="fondo-menu" class="fixed inset-0 top-16 bg-black/30 z-30 hidden"></div>
+
+        {% include 'cliente/componentes/menu_lateral.html' %}
+
+        {% include 'cliente/componentes/menu_categorias.html' %}
+
+        <!-- ===================== CONTENIDO ===================== -->
+        <main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-6 py-6 lg:py-7">
+            {% block contenido %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Aviso flotante (ej. "Agregado al carrito") -->
+    <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
+
+    <script src="{% static 'cliente/js/cliente.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
