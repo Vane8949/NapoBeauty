@@ -1,0 +1,17 @@
+{# Paginación. Necesita 'pagina' (Page de Django) y 'filtros' (query string sin ?pagina=). #}
+{% if pagina.paginator.num_pages > 1 %}
+<div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 text-sm text-gray-500">
+    <span>Mostrando {{ pagina.start_index }}–{{ pagina.end_index }} de {{ pagina.paginator.count }}</span>
+    <div class="flex items-center gap-1">
+        {% if pagina.has_previous %}
+        <a href="?{% if filtros %}{{ filtros }}&{% endif %}pagina={{ pagina.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-pink-50 hover:border-pink-200"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+        {% endif %}
+        <span class="px-3 py-1.5 rounded-lg bg-pink-100 text-pink-700 font-bold">{{ pagina.number }} / {{ pagina.paginator.num_pages }}</span>
+        {% if pagina.has_next %}
+        <a href="?{% if filtros %}{{ filtros }}&{% endif %}pagina={{ pagina.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-pink-50 hover:border-pink-200"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+        {% endif %}
+    </div>
+</div>
+{% elif pagina.paginator.count %}
+<div class="px-6 py-3 border-t border-gray-100 text-xs text-gray-400">{{ pagina.paginator.count }} registro{{ pagina.paginator.count|pluralize }}</div>
+{% endif %}
