@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'inventario' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a inventario</a>
+
+<div class="mb-6">
+    <h1 class="text-3xl font-extrabold text-gray-800">Movimientos de inventario</h1>
+    <p class="text-gray-500 text-sm mt-1">Todas las entradas, salidas, ajustes y devoluciones, de la más reciente a la más antigua</p>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <form method="get" class="px-6 py-4 flex justify-end border-b border-gray-100">
+        <select name="tipo" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+            <option value="">Todos los tipos</option>
+            {% for valor, nombre in tipos %}<option value="{{ valor }}" {% if tipo == valor %}selected{% endif %}>{{ nombre }}</option>{% endfor %}
+        </select>
+    </form>
+    {% include 'inventario/tabla_movimientos.html' with movimientos=pagina mostrar_producto=True %}
+    {% include 'componentes/paginacion.html' %}
+</div>
+{% endblock %}
