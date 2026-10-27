@@ -49,6 +49,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.contexto.panel',  # menú activo y usuario del panel
             ],
         },
     },
@@ -109,4 +110,14 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+}
+# Datos de la tienda que salen en el recibo de compra (ventas/<id>/recibo/).
+# Cámbialos por los datos reales de Napo Beauty.
+NAPO_TIENDA = {
+    'nombre': 'Napo Beauty',
+    'ruc': 'J0310000123456',
+    'direccion': 'Managua, Nicaragua',
+    'telefono': '+505 8888-9999',
+    'correo': 'admin@napobeauty.com',
+    'mensaje': '¡Gracias por tu compra! Cambios y devoluciones dentro de los 15 días presentando este recibo.',
 }
