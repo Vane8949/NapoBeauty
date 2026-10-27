@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load napo %}
+
+{% block content %}
+<a href="{% url 'productos' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a productos</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-3xl font-extrabold text-gray-800">{{ producto.nombre }}</h1>
+            {% include 'componentes/estado.html' with activo=producto.activo texto_no='Deshabilitado' %}
+        </div>
+        <p class="text-gray-500 text-sm mt-1">{{ producto.marca.nombre }} · SKU {{ producto.sku }}</p>
+    </div>
+    <div class="flex gap-3">
+        <a href="{% url 'inventario_detalle' producto.pk %}" class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-boxes-stacked"></i> Ver inventario</a>
+        {% if puede_editar %}<a href="{% url 'producto_editar' producto.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Foto e indicadores -->
+    <div class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div class="aspect-square rounded-xl bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center overflow-hidden">
+                {% if imagen %}<img src="{{ imagen.ruta.url }}" alt="{{ producto.nombre }}" class="w-full h-full object-contain">
+                {% else %}<div class="text-center text-pink-300"><i class="fa-solid fa-image text-5xl"></i><p class="text-xs mt-2">Sin foto</p></div>{% endif %}
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <p class="text-xs text-gray-500">Unidades vendidas</p>
+                <p class="text-2xl font-bold text-gray-800">{{ vendidos.unidades|default:0 }}</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <p class="text-xs text-gray-500">Calificación</p>
+                <p class="text-2xl font-bold text-gray-800">{% if resenas.total %}{{ resenas.promedio|floatformat:1 }} <i class="fa-solid fa-star text-amber-400 text-base"></i>{% else %}—{% endif %}</p>
+                <p class="text-xs text-gray-400">{{ resenas.total }} reseña{{ resenas.total|pluralize }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ficha -->
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-5">Información del producto</h2>
+            <dl class="grid grid-cols-2 md:grid-cols-3 gap-5">
+                {% include 'componentes/dato.html' with etiqueta='Categoría' valor=producto.categoria.nombre %}
+                {% include 'componentes/dato.html' with etiqueta='Grupo' valor=producto.categoria.categoria_padre.nombre %}
+                {% include 'componentes/dato.html' with etiqueta='Proveedor' valor=producto.proveedor.nombre_empresa %}
+                {% include 'componentes/dato.html' with etiqueta='Precio de venta' valor=producto.precio_venta|cordobas %}
+                {% include 'componentes/dato.html' with etiqueta='Precio de compra' valor=producto.precio_compra|cordobas %}
+                <div>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Margen</dt>
+                    <dd class="mt-1 text-sm font-medium {% if margen is not None and margen < 0 %}text-red-600{% else %}text-gray-800{% endif %}">{% if margen is not None %}{{ margen }}%{% else %}—{% endif %}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Stock actual</dt>
+                    <dd class="mt-1 text-sm font-bold {% if producto.stock_actual == 0 %}text-red-600{% elif producto.stock_bajo %}text-yellow-600{% else %}text-green-600{% endif %}">{{ producto.stock_actual }} unidades</dd>
+                </div>
+                {% include 'componentes/dato.html' with etiqueta='Stock mínimo' valor=producto.stock_minimo %}
+                {% include 'componentes/dato.html' with etiqueta='Registrado el' valor=producto.fecha_creacion|date:'d/m/Y' %}
+            </dl>
+            {% if producto.descripcion %}
+            <div class="mt-6 pt-5 border-t border-gray-100">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Descripción</p>
+                <p class="text-sm text-gray-700 whitespace-pre-line">{{ producto.descripcion }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 flex justify-between items-center border-b border-gray-100">
+                <h2 class="font-bold text-gray-800">Últimos movimientos de inventario</h2>
+                <a href="{% url 'inventario_detalle' producto.pk %}" class="text-sm text-pink-600 hover:underline">Ver todos</a>
+            </div>
+            {% include 'inventario/tabla_movimientos.html' with movimientos=movimientos %}
+        </div>
+    </div>
+</div>
+{% endblock %}
