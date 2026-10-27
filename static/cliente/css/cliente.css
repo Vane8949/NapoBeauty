@@ -1,0 +1,238 @@
+/* ==========================================================================
+   VISTA CLIENTE - Napo Beauty
+   Estilos que complementan a Tailwind. Colores iguales a cliente/js/cliente-config.js
+   ========================================================================== */
+
+:root {
+    --rosa-50: #FFF6F9;
+    --rosa-100: #FDE8EF;
+    --rosa-200: #F9D0DE;
+    --rosa-300: #F3A8C2;
+    --rosa-500: #E9578C;
+    --rosa-600: #D63F78;
+    --rosa-700: #AF2A62;
+    --tinta: #1F1A1C;
+    --ancho-lateral: 240px; /* igual a w-[240px] en las plantillas */
+}
+
+/* ---------- Cabecera ---------- */
+.cabecera-cliente {
+    background: linear-gradient(90deg, #FBE1EA 0%, #FDEFF4 55%, #FBE3EB 100%);
+}
+
+.enlace-cabecera {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .35rem .5rem;
+    border-radius: .75rem;
+    color: var(--tinta);
+    transition: background-color .15s;
+}
+.enlace-cabecera:hover { background-color: rgba(255, 255, 255, .7); }
+
+.insignia {
+    position: absolute;
+    top: -.55rem;
+    right: -.7rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 .3rem;
+    border-radius: 999px;
+    background: var(--rosa-500);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+    text-align: center;
+    border: 2px solid #FDEFF4;
+    box-sizing: content-box;
+}
+.insignia.salta { animation: salta .4s ease; }
+@keyframes salta { 50% { transform: scale(1.35); } }
+
+.menu-desplegable { animation: aparece .15s ease-out; }
+.opcion-desplegable {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .55rem 1rem;
+    font-size: .875rem;
+}
+.opcion-desplegable i { width: 1rem; text-align: center; }
+.opcion-desplegable:hover { background: var(--rosa-50); }
+
+/* ---------- Menú lateral ---------- */
+.barra-lateral {
+    position: fixed;
+    top: 4rem;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rosa-200) transparent;
+}
+.barra-lateral.abierta { transform: none; box-shadow: 0 10px 40px rgba(0, 0, 0, .15); }
+
+@media (min-width: 1024px) {
+    .barra-lateral {
+        position: sticky;
+        height: calc(100vh - 4rem);
+        transform: none;
+        transition: none;
+    }
+    .barra-lateral.colapsada { display: none; }
+}
+
+.item-lateral {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .55rem .7rem;
+    border-radius: .65rem;
+    font-size: .9rem;
+    white-space: nowrap;
+    color: var(--tinta);
+    text-align: left;
+    transition: background-color .15s;
+}
+.item-lateral i { width: 1.15rem; flex-shrink: 0; text-align: center; font-size: 1rem; }
+.item-lateral:hover { background: rgba(255, 255, 255, .8); }
+.item-lateral.activo { background: var(--rosa-200); font-weight: 500; }
+
+/* ---------- Menú de categorías ---------- */
+.mega-menu {
+    position: absolute;
+    left: var(--ancho-lateral);
+    top: 7.5rem;
+    z-index: 45;
+    width: min(620px, calc(100vw - var(--ancho-lateral) - 2rem));
+    max-height: calc(100vh - 6rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1.25rem 1.25rem 1rem;
+    background: #fff;
+    border: 1px solid var(--rosa-100);
+    border-radius: 1rem;
+    box-shadow: 0 18px 50px -12px rgba(175, 42, 98, .25);
+    animation: aparece .15s ease-out;
+}
+@media (max-width: 1023px) {
+    .mega-menu { position: fixed; left: 1rem; right: 1rem; top: 4.75rem; width: auto; }
+}
+
+@keyframes aparece {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ---------- Componentes ---------- */
+.circulo-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--rosa-100);
+    color: var(--rosa-600);
+}
+
+.tarjeta {
+    background: #fff;
+    border: 1px solid #ECE4E7;
+    border-radius: .85rem;
+    transition: box-shadow .2s, border-color .2s, transform .2s;
+}
+a.tarjeta:hover, article.tarjeta:hover {
+    border-color: var(--rosa-200);
+    box-shadow: 0 10px 25px -12px rgba(175, 42, 98, .3);
+}
+
+.acceso-rapido {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .75rem .9rem;
+    min-height: 5rem;
+}
+
+.ver-mas {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .9rem;
+    color: var(--rosa-700);
+    white-space: nowrap;
+}
+.ver-mas:hover { text-decoration: underline; }
+
+.btn-favorito {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--rosa-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+    transition: transform .15s;
+}
+.btn-favorito:hover { transform: scale(1.1); }
+
+.btn-carrito {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    width: 100%;
+    padding: .6rem .75rem;
+    border-radius: .5rem;
+    background: var(--rosa-500);
+    color: #fff;
+    font-size: .875rem;
+    font-weight: 500;
+    transition: background-color .15s;
+}
+.btn-carrito:hover { background: var(--rosa-600); }
+.btn-carrito.agregado { background: #2F9E6B; }
+
+.barra-progreso {
+    height: .5rem;
+    border-radius: 999px;
+    background: #ECE7E9;
+    overflow: hidden;
+}
+.barra-progreso span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--rosa-300), var(--rosa-500));
+}
+
+/* Aviso flotante */
+.aviso {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 60;
+    padding: .7rem 1.1rem;
+    border-radius: .75rem;
+    background: var(--tinta);
+    color: #fff;
+    font-size: .875rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 1rem);
+    transition: opacity .2s, transform .2s;
+}
+.aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+
+/* Foco visible para teclado */
+.tarjeta:focus-visible, .item-lateral:focus-visible, .btn-carrito:focus-visible,
+.btn-favorito:focus-visible, .enlace-cabecera:focus-visible {
+    outline: 3px solid var(--rosa-300);
+    outline-offset: 2px;
+}
