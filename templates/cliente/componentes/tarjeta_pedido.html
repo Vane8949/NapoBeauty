@@ -1,0 +1,17 @@
+{# Tarjeta de pedido reciente. Usa la variable 'pedido'. #}
+<a href="#" class="tarjeta p-3 flex flex-col gap-3">
+    <div class="flex gap-3">
+        <span class="w-16 h-16 shrink-0 rounded-lg bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center">
+            <i class="fa-solid {{ pedido.icono }} text-2xl text-rosa-300"></i>
+        </span>
+        <span class="text-sm leading-snug pt-1">
+            <span class="block font-medium">{{ pedido.marca }}</span>
+            <span class="block">{{ pedido.producto }}</span>
+        </span>
+    </div>
+    <div class="flex items-center justify-between text-sm">
+        <span>{{ pedido.fecha|date:"j b. Y" }}</span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+    </div>
+    <span class="block text-center text-sm font-medium rounded-md py-1.5 {{ pedido.clase_estado }}">{{ pedido.estado }}</span>
+</a>
