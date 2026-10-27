@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static napo %}
 
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
@@ -8,9 +8,11 @@
         <p class="text-gray-500 text-sm mt-1">Administra, añade y edita el catálogo de productos de Napo Beauty</p>
     </div>
     <div class="flex gap-3">
-        <button class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-2">
+        {% if puede_crear %}
+        <a href="{% url 'producto_crear' %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Agregar Producto
-        </button>
+        </a>
+        {% endif %}
         <button class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors">
             Importar/Exportar
         </button>
@@ -21,31 +23,50 @@
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="w-12 h-12 bg-pink-50 text-napo-primary rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-box-open"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Total de productos</p><h2 class="text-2xl font-bold text-gray-800">254</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Total de productos</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.total }}</h2></div>
     </div>
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
         <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-folder"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Categorías</p><h2 class="text-2xl font-bold text-gray-800">12</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Categorías</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.categorias }}</h2></div>
     </div>
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl"><i class="fa-regular fa-user"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Bajo Stock</p><h2 class="text-2xl font-bold text-gray-800">8</h2></div>
+        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-trend-down"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Bajo Stock</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.bajo_stock }}</h2></div>
     </div>
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-        <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Próximos a Caducar</p><h2 class="text-2xl font-bold text-gray-800">15</h2></div>
+        <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-eye-slash"></i></div>
+        <div><p class="text-xs text-gray-500 font-medium">Deshabilitados</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.inactivos }}</h2></div>
     </div>
 </div>
 
 <!-- Tabla -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <form method="get" class="p-4 border-b border-gray-100 flex flex-wrap gap-3 justify-between items-center">
+        <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, SKU o marca..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <select name="categoria" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todas las categorías</option>
+                {% for c in categorias %}<option value="{{ c.pk }}" {% if categoria == c.pk|stringformat:'s' %}selected{% endif %}>{{ c.nombre }}</option>{% endfor %}
+            </select>
+            <select name="estado" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los estados</option>
+                <option value="activos" {% if estado == 'activos' %}selected{% endif %}>Activos</option>
+                <option value="inactivos" {% if estado == 'inactivos' %}selected{% endif %}>Deshabilitados</option>
+            </select>
+            {% if busqueda %}<a href="{% url 'productos' %}" class="px-3 py-2 text-sm text-gray-500 hover:text-pink-600">Limpiar</a>{% endif %}
+        </div>
+    </form>
+
+    <div class="overflow-x-auto">
     <table class="w-full text-left text-sm">
         <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
             <tr>
-                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
                 <th class="py-4 px-6">Producto / SKU</th>
                 <th class="py-4 px-6">Categoría</th>
-                <th class="py-4 px-6">Variantes</th>
+                <th class="py-4 px-6">Marca</th>
                 <th class="py-4 px-6">Precio</th>
                 <th class="py-4 px-6 text-center">Stock</th>
                 <th class="py-4 px-6 text-center">Estado</th>
@@ -53,25 +74,35 @@
             </tr>
         </thead>
         <tbody class="text-gray-700">
+            {% for p in pagina %}
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
                 <td class="py-4 px-6">
-                    <p class="font-bold text-gray-800">Labial Velvet Matte</p>
-                    <p class="text-xs text-gray-400">SKU: NAP-001</p>
+                    <a href="{% url 'producto_detalle' p.pk %}" class="font-bold text-gray-800 hover:text-pink-600">{{ p.nombre }}</a>
+                    <p class="text-xs text-gray-400">SKU: {{ p.sku }}</p>
                 </td>
-                <td class="py-4 px-6 text-gray-500">Labios</td>
-                <td class="py-4 px-6"><span class="bg-blue-100 text-blue-600 text-[11px] px-3 py-1 rounded-full font-bold">4 Tonos</span></td>
-                <td class="py-4 px-6 font-bold">C$ 180.00</td>
-                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">50 (En stock)</span></td>
-                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Activo</span></td>
-                
-                <!-- COLUMNA ACCIONES CORREGIDA -->
+                <td class="py-4 px-6 text-gray-500">
+                    {{ p.categoria.nombre }}
+                    {% if p.categoria.categoria_padre %}<p class="text-xs text-gray-400">{{ p.categoria.categoria_padre.nombre }}</p>{% endif %}
+                </td>
+                <td class="py-4 px-6 text-gray-500">{{ p.marca.nombre }}</td>
+                <td class="py-4 px-6 font-bold whitespace-nowrap">{{ p.precio_venta|cordobas }}</td>
                 <td class="py-4 px-6 text-center">
-                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
-                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                    {% if p.stock_actual == 0 %}<span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">Agotado</span>
+                    {% elif p.stock_bajo %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ p.stock_actual }} (Bajo)</span>
+                    {% else %}<span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ p.stock_actual }} (En stock)</span>{% endif %}
+                </td>
+                <td class="py-4 px-6 text-center">{% include 'componentes/estado.html' with activo=p.activo %}</td>
+                <td class="py-4 px-6 text-center">
+                    {% url 'producto_detalle' p.pk as url_ver %}{% url 'producto_editar' p.pk as url_editar %}
+                    {% if puede_editar %}{% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %}{% else %}{% include 'componentes/acciones.html' with ver=url_ver %}{% endif %}
                 </td>
             </tr>
+            {% empty %}
+            {% include 'componentes/fila_vacia.html' with columnas=7 texto='Todavía no hay productos registrados.' %}
+            {% endfor %}
         </tbody>
     </table>
+    </div>
+    {% include 'componentes/paginacion.html' %}
 </div>
 {% endblock %}
