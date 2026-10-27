@@ -1,0 +1,55 @@
+{% load static %}
+{# Cabecera: logo, buscador, favoritos, usuario y carrito #}
+<header class="cabecera-cliente sticky top-0 z-50 h-16 flex items-center gap-2 sm:gap-4 pr-3 sm:pr-6 border-b border-rosa-100">
+    <a href="{% url 'cliente:mi_cuenta' %}" class="flex items-center justify-center shrink-0 pl-3 lg:pl-0 lg:w-[240px]" aria-label="Napo Beauty, inicio">
+        <img src="{% static 'img/logo.png' %}" alt="Napo Beauty" class="w-12 h-12 rounded-full object-cover bg-white shadow-sm">
+    </a>
+
+    <button id="btn-hamburguesa" type="button" class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-tinta hover:bg-white/70 transition" aria-label="Mostrar u ocultar menú" aria-controls="barra-lateral" aria-expanded="false">
+        <i class="fa-solid fa-bars text-lg"></i>
+    </button>
+
+    <form action="#" method="get" role="search" class="flex-1 min-w-0 max-w-[580px]">
+        <label for="buscador" class="sr-only">Buscar</label>
+        <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-tinta text-sm"></i>
+            <input id="buscador" name="q" type="search" placeholder="Buscar productos, marcas, categorías..." class="w-full h-10 pl-11 pr-4 bg-white border border-rosa-200 rounded-full text-sm placeholder:text-gray-500 shadow-sm focus:outline-none focus:border-rosa-300 focus:ring-4 focus:ring-rosa-100">
+        </div>
+    </form>
+
+    <div class="ml-auto flex items-center gap-1 sm:gap-4">
+        <!-- Favoritos -->
+        <a href="#" class="enlace-cabecera flex-col" aria-label="Favoritos">
+            <span class="relative">
+                <i class="fa-regular fa-heart text-xl"></i>
+                <span id="contador-favoritos" class="insignia">{{ total_favoritos }}</span>
+            </span>
+            <span class="hidden sm:block text-[11px] font-medium mt-0.5">Favoritos</span>
+        </a>
+
+        <!-- Menú de usuario -->
+        <div class="relative">
+            <button id="btn-usuario" type="button" class="enlace-cabecera" aria-haspopup="true" aria-expanded="false" aria-controls="menu-usuario">
+                <i class="fa-regular fa-user text-xl"></i>
+                <span class="hidden md:inline text-sm font-medium">Hola, {{ cliente.nombre }}</span>
+                <i class="fa-solid fa-chevron-down text-[10px] hidden md:inline"></i>
+            </button>
+            <div id="menu-usuario" class="menu-desplegable hidden absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-rosa-100 py-2 z-50">
+                <a href="{% url 'cliente:mi_cuenta' %}" class="opcion-desplegable"><i class="fa-regular fa-user"></i> Mi cuenta</a>
+                <a href="#" class="opcion-desplegable"><i class="fa-solid fa-box-open"></i> Mis pedidos</a>
+                <a href="#" class="opcion-desplegable"><i class="fa-regular fa-heart"></i> Favoritos</a>
+                <hr class="my-2 border-rosa-100">
+                <a href="{% url 'login' %}" class="opcion-desplegable text-rosa-700"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
+            </div>
+        </div>
+
+        <!-- Carrito -->
+        <a href="#" class="enlace-cabecera" aria-label="Carrito">
+            <span class="relative">
+                <i class="fa-solid fa-cart-shopping text-xl"></i>
+                <span id="contador-carrito" class="insignia">{{ total_carrito }}</span>
+            </span>
+            <span class="hidden sm:inline text-sm font-medium">Carrito</span>
+        </a>
+    </div>
+</header>
