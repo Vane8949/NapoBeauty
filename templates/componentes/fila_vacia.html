@@ -1,0 +1,6 @@
+<tr>
+    <td colspan="{{ columnas }}" class="py-14 text-center text-gray-400">
+        <i class="fa-regular fa-folder-open text-3xl mb-3 block text-pink-200"></i>
+        {% if busqueda %}No se encontró nada con esos filtros.{% else %}{{ texto|default:'Todavía no hay registros.' }}{% endif %}
+    </td>
+</tr>
