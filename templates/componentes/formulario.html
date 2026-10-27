@@ -1,0 +1,102 @@
+{% comment %}
+Formulario de Agregar / Editar. Se usa dentro de la ventana emergente (static/js/modales.js)
+y también como página completa si el navegador no tiene JavaScript (pagina_formulario.html).
+
+Contexto: form, titulo, icono, accion, volver_url, texto_boton
+Opcional: subtitulo, resumen [(etiqueta, valor)], ancho ('lg' | 'xl'), imagen_actual, seccion_extra (plantilla)
+{% endcomment %}
+<div class="bg-white rounded-2xl shadow-2xl w-full {% if ancho == 'xl' %}max-w-3xl{% elif ancho == 'lg' %}max-w-2xl{% else %}max-w-xl{% endif %} max-h-[92vh] flex flex-col {% if en_pagina %}mx-auto{% endif %}">
+    <!-- Encabezado -->
+    <div class="flex items-start gap-3 px-6 pt-6 pb-4">
+        <span class="w-10 h-10 shrink-0 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-lg"><i class="fa-solid {{ icono|default:'fa-pen-to-square' }}"></i></span>
+        <div class="flex-1 min-w-0">
+            <h2 class="text-xl font-extrabold text-gray-800">{{ titulo }}</h2>
+            {% if subtitulo %}<p class="text-xs text-gray-500 mt-0.5 truncate">{{ subtitulo }}</p>{% endif %}
+        </div>
+        {% if en_pagina %}
+        <a href="{{ volver_url }}" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100" aria-label="Cerrar"><i class="fa-solid fa-xmark text-lg"></i></a>
+        {% else %}
+        <button type="button" data-cerrar-modal class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100" aria-label="Cerrar"><i class="fa-solid fa-xmark text-lg"></i></button>
+        {% endif %}
+    </div>
+
+    <form method="post" action="{{ accion }}" enctype="multipart/form-data" class="flex-1 min-h-0 flex flex-col" novalidate>
+        {% csrf_token %}
+        <div class="flex-1 overflow-y-auto px-6 pb-4">
+            {% if form.non_field_errors %}
+            <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+                {% for error in form.non_field_errors %}<p><i class="fa-solid fa-circle-exclamation mr-2"></i>{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+
+            {% if resumen %}
+            <dl class="mb-5 grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-pink-50/60 border border-pink-100">
+                {% for etiqueta, valor in resumen %}
+                <div><dt class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">{{ etiqueta }}</dt><dd class="text-sm font-bold text-gray-800 mt-0.5">{{ valor }}</dd></div>
+                {% endfor %}
+            </dl>
+            {% endif %}
+
+            {% for oculto in form.hidden_fields %}{{ oculto }}{% endfor %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+                {% for campo in form.visible_fields %}{% if not campo.field.oculto_en_lista %}
+                <div class="{% if campo.field.ancho or campo.widget_type == 'checkbox' %}sm:col-span-2{% endif %}"{% if campo.field.mostrar_si %} data-mostrar-si="{{ campo.field.mostrar_si }}"{% endif %}>
+                    {% if campo.widget_type == 'radioselect' %}
+                    <p class="block text-sm font-medium text-gray-700 mb-1">{{ campo.label }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {% for opcion in campo %}
+                        <label class="cursor-pointer">
+                            {{ opcion.tag }}
+                            <span class="flex items-center justify-center text-center px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 transition-colors hover:border-pink-300 peer-checked:border-pink-400 peer-checked:bg-pink-50 peer-checked:text-pink-700 peer-focus-visible:ring-2 peer-focus-visible:ring-pink-200">{{ opcion.choice_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% if campo.help_text %}<p class="text-xs text-gray-400 mt-1">{{ campo.help_text }}</p>{% endif %}
+
+                    {% elif campo.widget_type == 'checkbox' %}
+                    <p class="text-sm font-medium text-gray-700 mb-2">Estado</p>
+                    <label class="inline-flex items-center gap-3 {% if campo.field.disabled %}opacity-60{% else %}cursor-pointer{% endif %}">
+                        {{ campo }}
+                        <span class="relative w-11 h-6 bg-gray-300 rounded-full transition-colors peer-checked:bg-pink-500 peer-focus-visible:ring-2 peer-focus-visible:ring-pink-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:bg-white after:rounded-full after:shadow after:transition-transform peer-checked:after:translate-x-5"></span>
+                        <span class="text-sm font-medium text-gray-700">{{ campo.label }}</span>
+                    </label>
+                    {% if campo.help_text %}<p class="text-xs text-gray-400 mt-1">{{ campo.help_text }}</p>{% endif %}
+
+                    {% elif campo.widget_type == 'file' %}
+                    <p class="block text-sm font-medium text-gray-700 mb-1">{{ campo.label }}</p>
+                    <label for="{{ campo.id_for_label }}" data-zona-imagen class="flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-pink-200 rounded-xl bg-pink-50/40 py-6 px-4 text-center cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-colors">
+                        <img data-vista-previa src="{{ imagen_actual|default:'' }}" alt="" class="{% if not imagen_actual %}hidden {% endif %}h-24 w-24 object-cover rounded-lg mb-2 shadow-sm">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-pink-400"></i>
+                        <span data-nombre-archivo class="text-sm text-gray-600">Arrastra una imagen o haz clic para subir</span>
+                        <span class="text-xs text-gray-400">JPG, PNG o WEBP (máx. 2 MB)</span>
+                        {{ campo }}
+                    </label>
+                    {% if campo.help_text %}<p class="text-xs text-gray-400 mt-1">{{ campo.help_text }}</p>{% endif %}
+
+                    {% else %}
+                    <label for="{{ campo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ campo.label }}{% if campo.field.required and not campo.field.disabled or campo.field.obligatorio_si %} <span class="text-pink-500">*</span>{% endif %}
+                    </label>
+                    {{ campo }}
+                    {% if campo.help_text %}<p class="text-xs text-gray-400 mt-1">{{ campo.help_text }}</p>{% endif %}
+                    {% endif %}
+                    {% for error in campo.errors %}<p class="text-xs text-red-600 mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ error }}</p>{% endfor %}
+                </div>
+                {% endif %}{% endfor %}
+            </div>
+
+            {% if seccion_extra %}{% include seccion_extra %}{% endif %}
+        </div>
+
+        <!-- Botones -->
+        <div class="grid grid-cols-2 gap-3 px-6 py-5 border-t border-gray-100">
+            {% if en_pagina %}
+            <a href="{{ volver_url }}" class="text-center py-3 rounded-xl border border-pink-300 text-pink-600 font-bold text-sm hover:bg-pink-50">Cancelar</a>
+            {% else %}
+            <button type="button" data-cerrar-modal class="py-3 rounded-xl border border-pink-300 text-pink-600 font-bold text-sm hover:bg-pink-50">Cancelar</button>
+            {% endif %}
+            <button type="submit" class="py-3 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm shadow-md disabled:opacity-60" data-texto-guardando="Guardando...">{{ texto_boton|default:'Guardar cambios' }}</button>
+        </div>
+    </form>
+</div>
