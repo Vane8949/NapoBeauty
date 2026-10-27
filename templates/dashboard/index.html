@@ -1,22 +1,21 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static napo %}
 
 {% block content %}
 <!-- Banner y Fecha -->
 <div class="flex flex-col xl:flex-row gap-6 mb-6">
     <div class="flex-1 bg-gradient-to-r from-pink-100 to-pink-50 rounded-2xl p-8 flex justify-between items-center shadow-sm border border-pink-100 relative overflow-hidden">
         <div class="flex items-center gap-6 z-10">
-            <!-- Logo del banner actualizado -->
             <div class="w-24 h-24 bg-white rounded-full border border-pink-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
                  <img src="{% static 'img/logo.png' %}" alt="Logo Napo Beauty" class="w-full h-full object-cover">
             </div>
             <div>
                 <p class="text-napo-text font-bold text-lg mb-1">Bienvenido de nuevo,</p>
-                <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">Administrador</h1>
-                <p class="text-gray-600 mt-2">Aquí puedes gestionar todo el sistema de Napo Beauty.</p>
+                <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">{{ nombre_panel }}</h1>
+                <p class="text-gray-600 mt-2">{% if usuario_panel %}{{ usuario_panel.rol.nombre }} · {% endif %}Aquí puedes gestionar todo el sistema de Napo Beauty.</p>
             </div>
         </div>
-        <i class="fa-regular fa-heart text-pink-300 text-6xl mr-12 z-10 opacity-60"></i>
+        <i class="fa-regular fa-heart text-pink-300 text-6xl mr-12 z-10 opacity-60 hidden md:block"></i>
     </div>
 
     <div class="w-full xl:w-72 flex flex-col gap-4 justify-center">
@@ -24,14 +23,14 @@
             <div class="w-12 h-12 bg-pink-50 text-napo-primary rounded-xl flex items-center justify-center text-xl"><i class="fa-regular fa-calendar"></i></div>
             <div>
                 <p class="text-xs text-gray-500 font-medium">Hoy es</p>
-                <p class="text-sm font-bold text-gray-800">17 de abril de 2025</p>
+                <p class="text-sm font-bold text-gray-800">{{ ahora|date:'l j \d\e F \d\e Y'|capfirst }}</p>
             </div>
         </div>
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
             <div class="w-12 h-12 bg-pink-50 text-napo-primary rounded-xl flex items-center justify-center text-xl"><i class="fa-regular fa-clock"></i></div>
             <div>
                 <p class="text-xs text-gray-500 font-medium">Hora</p>
-                <p class="text-sm font-bold text-gray-800">10:24 a. m.</p>
+                <p class="text-sm font-bold text-gray-800" data-reloj>{{ ahora|date:'h:i a' }}</p>
             </div>
         </div>
     </div>
@@ -39,96 +38,123 @@
 
 <!-- Tarjetas KPI -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+    <a href="{% url 'productos' %}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-pink-200 transition">
         <div class="w-12 h-12 bg-pink-50 text-napo-primary rounded-full flex items-center justify-center absolute top-6 right-6 text-xl"><i class="fa-solid fa-box-open"></i></div>
         <p class="text-sm text-gray-500 font-medium mb-2">Total de productos</p>
-        <h2 class="text-4xl font-bold text-gray-800 mb-3">254</h2>
-        <p class="text-green-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i> +12% <span class="text-gray-400 font-normal ml-1">vs. mes anterior</span></p>
-    </div>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+        <h2 class="text-4xl font-bold text-gray-800 mt-4 mb-3">{{ kpi.productos }}</h2>
+        <p class="text-xs font-bold {% if kpi.productos_nuevos %}text-green-500{% else %}text-gray-400{% endif %}">{% if kpi.productos_nuevos %}<i class="fa-solid fa-arrow-up"></i> +{{ kpi.productos_nuevos }}{% else %}Sin productos nuevos{% endif %} <span class="text-gray-400 font-normal ml-1">{% if kpi.productos_nuevos %}nuevo{{ kpi.productos_nuevos|pluralize }} {% endif %}este mes</span></p>
+    </a>
+    <a href="{% url 'ventas' %}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-pink-200 transition">
         <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center absolute top-6 right-6 text-xl"><i class="fa-solid fa-cart-shopping"></i></div>
         <p class="text-sm text-gray-500 font-medium mb-2">Ventas del mes</p>
-        <h2 class="text-4xl font-bold text-gray-800 mb-3">C$ 12,450.00</h2>
-        <p class="text-green-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i> +12% <span class="text-gray-400 font-normal ml-1">vs. mes anterior</span></p>
-    </div>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+        <h2 class="text-2xl 2xl:text-3xl font-bold text-gray-800 mt-5 mb-4 whitespace-nowrap">{{ kpi.ventas_mes|cordobas }}</h2>
+        {% include 'dashboard/variacion.html' with v=kpi.ventas_variacion texto='vs. mismos días del mes anterior' %}
+    </a>
+    <a href="{% url 'clientes' %}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-pink-200 transition">
         <div class="w-12 h-12 bg-pink-50 text-napo-primary rounded-full flex items-center justify-center absolute top-6 right-6 text-xl"><i class="fa-regular fa-user"></i></div>
         <p class="text-sm text-gray-500 font-medium mb-2">Clientes registrados</p>
-        <h2 class="text-4xl font-bold text-gray-800 mb-3">124</h2>
-        <p class="text-green-500 text-xs font-bold"><i class="fa-solid fa-arrow-up"></i> +10% <span class="text-gray-400 font-normal ml-1">vs. mes anterior</span></p>
-    </div>
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+        <h2 class="text-4xl font-bold text-gray-800 mt-4 mb-3">{{ kpi.clientes }}</h2>
+        <p class="text-xs font-bold {% if kpi.clientes_nuevos %}text-green-500{% else %}text-gray-400{% endif %}">{% if kpi.clientes_nuevos %}<i class="fa-solid fa-arrow-up"></i> +{{ kpi.clientes_nuevos }}{% else %}Sin clientes nuevos{% endif %} <span class="text-gray-400 font-normal ml-1">{% if kpi.clientes_nuevos %}nuevo{{ kpi.clientes_nuevos|pluralize }} {% endif %}este mes</span></p>
+    </a>
+    <a href="{% url 'ventas' %}?canal=En+linea" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-pink-200 transition">
         <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center absolute top-6 right-6 text-xl"><i class="fa-solid fa-truck-fast"></i></div>
         <p class="text-sm text-gray-500 font-medium mb-2">Pedidos pendientes</p>
-        <h2 class="text-4xl font-bold text-gray-800 mb-3">15</h2>
-        <p class="text-orange-400 text-xs font-bold"><i class="fa-solid fa-arrow-trend-up"></i> +8% <span class="text-gray-400 font-normal ml-1">vs. mes anterior</span></p>
-    </div>
+        <h2 class="text-4xl font-bold text-gray-800 mt-4 mb-3">{{ kpi.pedidos_pendientes }}</h2>
+        <p class="text-xs font-bold {% if kpi.pedidos_pendientes %}text-orange-400{% else %}text-gray-400{% endif %}"><i class="fa-solid fa-truck"></i> {{ kpi.pedidos_en_camino }} en camino <span class="text-gray-400 font-normal ml-1">· pedidos en línea sin entregar</span></p>
+    </a>
 </div>
 
-<!-- Contenedores de Gráficos -->
+<!-- Gráficos -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
     <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-chart-line text-napo-primary"></i> Ventas de los últimos 7 días</h3>
-            <select class="text-sm border border-gray-200 rounded-lg px-3 py-1 outline-none text-gray-600 bg-gray-50"><option>C$</option></select>
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-chart-line text-napo-primary"></i> Ventas de los últimos 7 días</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Total de la semana: <strong class="text-gray-600">{{ total_semana|cordobas }}</strong></p>
+            </div>
+            <select data-grafica-modo class="text-sm border border-gray-200 rounded-lg px-3 py-1 outline-none text-gray-600 bg-gray-50">
+                <option value="montos">C$</option>
+                <option value="cantidades">N.º de ventas</option>
+            </select>
         </div>
         <div class="h-64 relative w-full"><canvas id="lineChart"></canvas></div>
     </div>
-    
+
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 class="font-bold text-gray-800 text-lg mb-6 flex items-center gap-2"><i class="fa-regular fa-clock text-napo-primary"></i> Productos más vendidos</h3>
-        <div class="relative h-56 flex justify-center mt-4">
+        <h3 class="font-bold text-gray-800 text-lg mb-1 flex items-center gap-2"><i class="fa-regular fa-clock text-napo-primary"></i> Productos más vendidos</h3>
+        <p class="text-xs text-gray-400 mb-4">Unidades vendidas en los últimos 30 días</p>
+        {% if top_unidades %}
+        <div class="relative h-56 flex justify-center">
             <canvas id="doughnutChart"></canvas>
-            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
-                <span class="text-xs text-gray-500 font-medium">Top 5</span>
-                <span class="text-xs text-gray-500 font-medium">productos</span>
-            </div>
         </div>
+        {% else %}
+        <div class="h-56 flex flex-col items-center justify-center text-center text-sm text-gray-400">
+            <i class="fa-solid fa-chart-pie text-4xl text-pink-200 mb-3"></i>
+            Todavía no hay ventas en los últimos 30 días.
+        </div>
+        {% endif %}
     </div>
 </div>
 
 <!-- Tablas y Accesos -->
 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-    
+
     <!-- Columna Izquierda -->
     <div class="flex flex-col gap-6">
         <!-- Últimas Ventas -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex justify-between items-center mb-5">
                 <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-napo-primary text-sm"></i> Últimas ventas</h3>
-                <a href="#" class="text-napo-primary text-sm font-bold hover:underline">Ver todas &rarr;</a>
+                <a href="{% url 'ventas' %}" class="text-napo-primary text-sm font-bold hover:underline">Ver todas &rarr;</a>
             </div>
+            <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="text-gray-400 border-b border-gray-100 font-medium">
-                    <tr><th class="pb-3 w-8">#</th><th class="pb-3">Cliente</th><th class="pb-3">Fecha</th><th class="pb-3">Total</th><th class="pb-3 text-center">Estado</th></tr>
+                    <tr><th class="pb-3">Factura</th><th class="pb-3">Cliente</th><th class="pb-3">Fecha</th><th class="pb-3">Total</th><th class="pb-3 text-center">Estado</th></tr>
                 </thead>
                 <tbody class="text-gray-700">
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3">1</td><td class="py-3">María López</td><td class="py-3 text-gray-500 text-xs">17/04/2025</td><td class="py-3 font-bold">C$ 880.00</td><td class="py-3 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Completada</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3">2</td><td class="py-3">Ana García</td><td class="py-3 text-gray-500 text-xs">10/04/2025</td><td class="py-3 font-bold">C$ 830.00</td><td class="py-3 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Completada</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3">3</td><td class="py-3">Valeria Ruiz</td><td class="py-3 text-gray-500 text-xs">10/04/2025</td><td class="py-3 font-bold">C$ 1,240.00</td><td class="py-3 text-center"><span class="bg-orange-100 text-orange-600 text-[11px] px-3 py-1 rounded-full font-bold">En proceso</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3">4</td><td class="py-3">Fernanda Torres</td><td class="py-3 text-gray-500 text-xs">10/04/2025</td><td class="py-3 font-bold">C$ 700.00</td><td class="py-3 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Completada</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="hover:bg-pink-50 transition"><td class="py-3">5</td><td class="py-3">Daniela Pérez</td><td class="py-3 text-gray-500 text-xs">10/04/2025</td><td class="py-3 font-bold">C$ 880.00</td><td class="py-3 text-center"><span class="bg-orange-100 text-orange-600 text-[11px] px-3 py-1 rounded-full font-bold">En proceso</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
+                    {% for v in ultimas_ventas %}
+                    <tr class="border-b border-gray-50 last:border-0 hover:bg-pink-50 transition">
+                        <td class="py-3"><a href="{% url 'venta_detalle' v.pk %}" class="text-gray-500 hover:text-pink-600">{{ v.numero_factura }}</a></td>
+                        <td class="py-3">{{ v.cliente|default:'Cliente de mostrador' }}</td>
+                        <td class="py-3 text-gray-500 text-xs whitespace-nowrap">{{ v.fecha|date:'d/m/Y' }}</td>
+                        <td class="py-3 font-bold whitespace-nowrap">{{ v.total|cordobas }}</td>
+                        <td class="py-3 text-center whitespace-nowrap">{% include 'ventas/estado_venta.html' %} <a href="{% url 'venta_detalle' v.pk %}" aria-label="Ver venta"><i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="py-8 text-center text-gray-400">Todavía no hay ventas registradas.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Pedidos Recientes -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-truck text-napo-primary text-sm"></i> Pedidos recientes</h3>
-                <a href="#" class="text-napo-primary text-sm font-bold hover:underline">Ver todos &rarr;</a>
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-truck text-napo-primary text-sm"></i> Pedidos en línea recientes</h3>
+                <a href="{% url 'ventas' %}?canal=En+linea" class="text-napo-primary text-sm font-bold hover:underline">Ver todos &rarr;</a>
             </div>
+            <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="text-gray-400 border-b border-gray-100 font-medium">
                     <tr><th class="pb-3"># Pedido</th><th class="pb-3">Cliente</th><th class="pb-3">Fecha</th><th class="pb-3 text-center">Estado</th><th class="pb-3">Total</th></tr>
                 </thead>
                 <tbody class="text-gray-700">
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3 text-gray-500">#000124</td><td class="py-3">Ana Garcia</td><td class="py-3 text-gray-500 text-xs">17/04/2025</td><td class="py-3 text-center"><span class="bg-orange-100 text-orange-600 text-[11px] px-3 py-1 rounded-full font-bold">En proceso</span></td><td class="py-3 font-bold">C$ 520.00 <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3 text-gray-500">#000123</td><td class="py-3">Valeria Ruiz</td><td class="py-3 text-gray-500 text-xs">16/04/2025</td><td class="py-3 text-center"><span class="bg-orange-100 text-orange-600 text-[11px] px-3 py-1 rounded-full font-bold">En proceso</span></td><td class="py-3 font-bold">C$ 1,240.00 <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3 text-gray-500">#000122</td><td class="py-3">Fernanda Torres</td><td class="py-3 text-gray-500 text-xs">15/04/2025</td><td class="py-3 text-center"><span class="bg-blue-100 text-blue-600 text-[11px] px-3 py-1 rounded-full font-bold">Enviado</span></td><td class="py-3 font-bold">C$ 760.00 <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="hover:bg-pink-50 transition"><td class="py-3 text-gray-500">#000121</td><td class="py-3">Daniela Pérez</td><td class="py-3 text-gray-500 text-xs">15/04/2025</td><td class="py-3 text-center"><span class="bg-blue-100 text-blue-600 text-[11px] px-3 py-1 rounded-full font-bold">Enviado</span></td><td class="py-3 font-bold">C$ 560.00 <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
+                    {% for v in pedidos_recientes %}
+                    <tr class="border-b border-gray-50 last:border-0 hover:bg-pink-50 transition">
+                        <td class="py-3"><a href="{% url 'venta_detalle' v.pk %}" class="text-gray-500 hover:text-pink-600">{{ v.numero_factura }}</a></td>
+                        <td class="py-3">{{ v.cliente|default:'—' }}</td>
+                        <td class="py-3 text-gray-500 text-xs whitespace-nowrap">{{ v.fecha|date:'d/m/Y' }}</td>
+                        <td class="py-3 text-center">{% include 'ventas/estado_venta.html' %}</td>
+                        <td class="py-3 font-bold whitespace-nowrap">{{ v.total|cordobas }} <a href="{% url 'venta_detalle' v.pk %}" aria-label="Ver pedido"><i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="py-8 text-center text-gray-400">Todavía no hay pedidos de la tienda en línea.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
@@ -137,57 +163,56 @@
         <!-- Productos con bajo stock -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i> Productos con bajo stock</h3>
-                <a href="#" class="text-napo-primary text-sm font-bold hover:underline">Ver todos &rarr;</a>
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i> Productos con bajo stock {% if bajo_stock_total %}<span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">{{ bajo_stock_total }}</span>{% endif %}</h3>
+                <a href="{% url 'inventario' %}?stock=bajo" class="text-napo-primary text-sm font-bold hover:underline">Ver todos &rarr;</a>
             </div>
+            <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="text-gray-400 border-b border-gray-100 font-medium">
                     <tr><th class="pb-3 w-12">Imagen</th><th class="pb-3">Producto</th><th class="pb-3 text-center">Stock</th><th class="pb-3 text-center">Estado</th></tr>
                 </thead>
                 <tbody class="text-gray-700">
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3"><div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div></td><td class="py-3 font-medium">Labial líquido Matte</td><td class="py-3 text-center text-red-500 font-extrabold">3</td><td class="py-3 text-center"><span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold">Bajo stock</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3"><div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div></td><td class="py-3 font-medium">Paleta de sombras</td><td class="py-3 text-center text-red-500 font-extrabold">5</td><td class="py-3 text-center"><span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold">Bajo stock</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3"><div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div></td><td class="py-3 font-medium">Sérum facial</td><td class="py-3 text-center text-red-500 font-extrabold">8</td><td class="py-3 text-center"><span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold">Bajo stock</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="border-b border-gray-50 hover:bg-pink-50 transition"><td class="py-3"><div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div></td><td class="py-3 font-medium">Crema hidratante</td><td class="py-3 text-center text-green-500 font-bold">12</td><td class="py-3 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">En stock</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
-                    <tr class="hover:bg-pink-50 transition"><td class="py-3"><div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div></td><td class="py-3 font-medium">Máscara de pestañas</td><td class="py-3 text-center text-green-500 font-bold">15</td><td class="py-3 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">En stock</span> <i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></td></tr>
+                    {% for p in bajo_stock %}
+                    <tr class="border-b border-gray-50 last:border-0 hover:bg-pink-50 transition">
+                        <td class="py-3">
+                            {% if p.fotos %}<img src="{{ p.fotos.0.ruta.url }}" alt="" class="w-10 h-10 rounded-lg object-cover bg-pink-50">
+                            {% else %}<div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div>{% endif %}
+                        </td>
+                        <td class="py-3"><a href="{% url 'inventario_detalle' p.pk %}" class="font-medium text-gray-800 hover:text-pink-600">{{ p.nombre }}</a><p class="text-xs text-gray-400">{{ p.marca.nombre }} · mínimo {{ p.stock_minimo }}</p></td>
+                        <td class="py-3 text-center font-extrabold {% if p.stock_actual == 0 %}text-red-600{% else %}text-red-500{% endif %}">{{ p.stock_actual }}</td>
+                        <td class="py-3 text-center whitespace-nowrap">
+                            {% if p.stock_actual == 0 %}<span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold">Agotado</span>
+                            {% else %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold">Bajo stock</span>{% endif %}
+                            <a href="{% url 'inventario_detalle' p.pk %}" aria-label="Ver inventario"><i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="py-8 text-center text-gray-400"><i class="fa-solid fa-circle-check text-green-400 mr-1"></i> Todos los productos tienen stock suficiente.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Accesos Rápidos -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex-1">
             <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2 mb-6"><i class="fa-solid fa-bolt text-napo-primary text-sm"></i> Accesos rápidos</h3>
-            <div class="grid grid-cols-2 lg:grid-cols-6 gap-3">
-                <button class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent">
-                    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid fa-box-open"></i></div>
-                    <span class="text-[9px] text-center font-bold text-gray-700">Agregar<br>producto</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent">
-                    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid fa-cart-arrow-down"></i></div>
-                    <span class="text-[9px] text-center font-bold text-gray-700">Registrar<br>venta</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent">
-                    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid fa-boxes-stacked"></i></div>
-                    <span class="text-[9px] text-center font-bold text-gray-700">Gestionar<br>inventario</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent">
-                    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid fa-arrow-rotate-left"></i></div>
-                    <span class="text-[9px] text-center font-bold text-gray-700">Gestionar<br>devoluciones</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent">
-                    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid fa-chart-column"></i></div>
-                    <span class="text-[9px] text-center font-bold text-gray-700">Ver<br>reportes</span>
-                </button>
-                <button class="flex flex-col items-center gap-2 p-3 bg-napo-bg rounded-xl hover:bg-pink-100 transition border border-transparent">
-                    <div class="w-10 h-10 bg-white text-napo-primary rounded-lg flex items-center justify-center shadow-sm"><i class="fa-solid fa-users-gear"></i></div>
-                    <span class="text-[9px] text-center font-bold text-gray-700">Gestionar<br>usuarios</span>
-                </button>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                {% if puede.productos %}{% url 'producto_crear' as url %}{% include 'dashboard/acceso.html' with url=url icono='fa-box-open' texto='Agregar<br>producto' modal=True %}{% endif %}
+                {% if puede.ventas %}{% url 'venta_crear' as url %}{% include 'dashboard/acceso.html' with url=url icono='fa-cart-arrow-down' texto='Registrar<br>venta' modal=True %}{% endif %}
+                {% if puede.inventario %}{% url 'inventario' as url %}{% include 'dashboard/acceso.html' with url=url icono='fa-boxes-stacked' texto='Gestionar<br>inventario' %}{% endif %}
+                {% if puede.devoluciones %}{% url 'devoluciones' as url %}{% include 'dashboard/acceso.html' with url=url icono='fa-arrow-rotate-left' texto='Gestionar<br>devoluciones' %}{% endif %}
+                {% if puede.reportes %}{% url 'reportes' as url %}{% include 'dashboard/acceso.html' with url=url icono='fa-chart-column' texto='Ver<br>reportes' %}{% endif %}
+                {% if puede.usuarios %}{% url 'usuarios' as url %}{% include 'dashboard/acceso.html' with url=url icono='fa-users-gear' texto='Gestionar<br>usuarios' %}{% endif %}
             </div>
         </div>
     </div>
 </div>
+
+{{ grafica_dias|json_script:'datos-ventas-dias' }}
+{{ grafica_top|json_script:'datos-top-productos' }}
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/dashboard_charts.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}?v=2"></script>
 {% endblock %}
