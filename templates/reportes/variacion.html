@@ -1,0 +1,5 @@
+{# Variación vs. periodo anterior. Variable: v ({'valor', 'sube'} | {'nuevo'} | None) #}
+{% if v is None %}<p class="text-[10px] text-gray-500 font-bold mt-1">Sin datos para comparar</p>
+{% elif v.nuevo %}<p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> Nuevo <span class="text-gray-500 font-normal">vs. periodo anterior</span></p>
+{% elif v.sube %}<p class="text-[10px] text-green-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +{{ v.valor }}% <span class="text-gray-500 font-normal">vs. periodo anterior</span></p>
+{% else %}<p class="text-[10px] text-red-600 font-bold mt-1"><i class="fa-solid fa-arrow-trend-down"></i> −{{ v.valor }}% <span class="text-gray-500 font-normal">vs. periodo anterior</span></p>{% endif %}
