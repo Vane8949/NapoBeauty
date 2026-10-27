@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static napo %}
 
 {% block content %}
 <div class="mb-6 flex justify-between items-start">
@@ -8,9 +8,11 @@
         <p class="text-gray-500 text-sm mt-1">Gestiona la base de datos de tus clientes, historial de compras y perfiles</p>
     </div>
     <div class="flex flex-col gap-3">
-        <button class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
+        {% if puede_crear %}
+        <a href="{% url 'cliente_crear' %}" data-modal class="bg-[#831843] hover:bg-[#9d1e51] text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus"></i> Registrar Cliente
-        </button>
+        </a>
+        {% endif %}
         <button class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2">
             <i class="fa-solid fa-download"></i> Historial de Puntos
         </button>
@@ -21,85 +23,84 @@
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
     <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-users"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium">Total de Clientes</p>
-            <h2 class="text-2xl font-bold text-gray-800">1,254</h2>
-            <p class="text-[10px] text-green-500 font-bold mt-1">+12% <span class="text-gray-400 font-normal">vs. mes anterior</span></p>
-        </div>
+        <div><p class="text-xs text-gray-500 font-medium">Total de Clientes</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.total }}</h2></div>
     </div>
     <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-purple-100 text-purple-500 rounded-full flex items-center justify-center text-lg"><i class="fa-regular fa-user"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium">Clientes Activos</p>
-            <h2 class="text-2xl font-bold text-gray-800">982</h2>
-            <p class="text-[10px] text-green-500 font-bold mt-1">+5% <span class="text-gray-400 font-normal">vs. mes anterior</span></p>
-        </div>
+        <div><p class="text-xs text-gray-500 font-medium">Clientes Activos</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.activos }}</h2></div>
     </div>
     <div class="bg-pink-50 p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-pink-200 text-pink-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-plus"></i></div>
-        <div>
-            <p class="text-xs text-gray-500 font-medium">Clientes Nuevos (Mes)</p>
-            <h2 class="text-2xl font-bold text-gray-800">124</h2>
-            <p class="text-[10px] text-green-500 font-bold mt-1">+10% <span class="text-gray-400 font-normal">vs. mes anterior</span></p>
-        </div>
+        <div><p class="text-xs text-gray-500 font-medium">Clientes Nuevos (Mes)</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.nuevos }}</h2></div>
     </div>
     <div class="bg-yellow-50 p-5 rounded-2xl shadow-sm border border-yellow-100 flex items-center gap-4">
         <div class="w-10 h-10 bg-yellow-200 text-yellow-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-money-bill-wave"></i></div>
-        <div><p class="text-xs text-gray-500 font-medium">Ticket Promedio General</p><h2 class="text-2xl font-bold text-gray-800">C$ 745.00</h2></div>
+        <div><p class="text-xs text-gray-500 font-medium">Ticket Promedio General</p><h2 class="text-2xl font-bold text-gray-800">{{ kpi.ticket|cordobas }}</h2></div>
     </div>
 </div>
 
 <!-- Tabla -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white">
-        <div class="relative w-72">
+    <form method="get" class="p-4 border-b border-gray-100 flex flex-wrap gap-3 justify-between items-center bg-white">
+        <div class="relative w-full sm:w-72">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
-            <input type="text" placeholder="Buscar por ID, cliente, venta..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar por ID, nombre, correo o teléfono..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-pink-300">
         </div>
-        <div class="flex gap-2">
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Estado</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Nivel de Cliente</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Fecha de registro</option></select>
-            <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white"><option>Ordenar por</option></select>
+        <div class="flex flex-wrap gap-2">
+            <select name="estado" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Todos los estados</option>
+                <option value="activos" {% if estado == 'activos' %}selected{% endif %}>Activos</option>
+                <option value="inactivos" {% if estado == 'inactivos' %}selected{% endif %}>Deshabilitados</option>
+            </select>
+            <select name="orden" onchange="this.form.submit()" class="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 bg-white">
+                <option value="">Ordenar por nombre</option>
+                <option value="compras" {% if orden == 'compras' %}selected{% endif %}>Mayor total comprado</option>
+                <option value="puntos" {% if orden == 'puntos' %}selected{% endif %}>Más puntos</option>
+                <option value="recientes" {% if orden == 'recientes' %}selected{% endif %}>Registrados recientemente</option>
+            </select>
+            {% if busqueda or orden %}<a href="{% url 'clientes' %}" class="px-3 py-2 text-sm text-gray-500 hover:text-pink-600">Limpiar</a>{% endif %}
         </div>
-    </div>
+    </form>
+    <div class="overflow-x-auto">
     <table class="w-full text-left text-sm">
         <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
             <tr>
-                <th class="py-4 px-6 w-12"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></th>
-                <th class="py-4 px-6">ID Cliente</th>
+                <th class="py-4 px-6">ID</th>
                 <th class="py-4 px-6">Cliente</th>
                 <th class="py-4 px-6">Teléfono</th>
-                <th class="py-4 px-6 text-center">Nivel</th>
-                <th class="py-4 px-6 text-center">Compras Realizadas</th>
-                <th class="py-4 px-6">Total Invertido (C$)</th>
+                <th class="py-4 px-6 text-center">Puntos</th>
+                <th class="py-4 px-6 text-center">Compras</th>
+                <th class="py-4 px-6">Total Invertido</th>
                 <th class="py-4 px-6">Última Compra</th>
                 <th class="py-4 px-6 text-center">Estado</th>
                 <th class="py-4 px-6 text-center">Acciones</th>
             </tr>
         </thead>
         <tbody class="text-gray-700">
+            {% for c in pagina %}
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                <td class="py-4 px-6"><input type="checkbox" class="rounded border-gray-300 text-pink-500 focus:ring-pink-500"></td>
-                <td class="py-4 px-6 font-medium">#1024</td>
+                <td class="py-4 px-6 font-medium text-gray-500">#{{ c.pk }}</td>
                 <td class="py-4 px-6">
-                    <p class="font-bold text-gray-800">Ana García</p>
-                    <p class="text-xs text-gray-400">ana.garcia@email.com</p>
+                    <a href="{% url 'cliente_detalle' c.pk %}" class="font-bold text-gray-800 hover:text-pink-600">{{ c }}</a>
+                    <p class="text-xs text-gray-400">{{ c.correo|default:'Sin correo' }}</p>
                 </td>
-                <td class="py-4 px-6 text-gray-500">+505 8888-8888</td>
-                <td class="py-4 px-6 text-center"><span class="bg-purple-100 text-purple-600 text-[11px] px-3 py-1 rounded-full font-bold">Diamante</span></td>
-                <td class="py-4 px-6 text-center text-gray-500">35 Compras</td>
-                <td class="py-4 px-6 font-bold">C$ 18,450.00</td>
-                <td class="py-4 px-6 text-gray-500 text-xs">17/04/2025</td>
-                <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">Activo</span></td>
-                
-                <!-- COLUMNA ACCIONES CORREGIDA -->
-                <td class="py-4 px-6 text-center whitespace-nowrap">
-                    <button class="text-gray-400 hover:text-pink-500 transition mx-1" title="Ver detalles"><i class="fa-regular fa-eye"></i></button>
-                    <button class="text-gray-400 hover:text-blue-500 transition mx-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                <td class="py-4 px-6 text-gray-500 whitespace-nowrap">{{ c.telefono|default:'—' }}</td>
+                <td class="py-4 px-6 text-center"><span class="bg-purple-100 text-purple-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ c.puntos_disponibles }} pts</span></td>
+                <td class="py-4 px-6 text-center text-gray-500">{{ c.compras }}</td>
+                <td class="py-4 px-6 font-bold whitespace-nowrap">{{ c.total_comprado|cordobas }}</td>
+                <td class="py-4 px-6 text-gray-500 text-xs whitespace-nowrap">{{ c.ultima_compra|date:'d/m/Y'|default:'—' }}</td>
+                <td class="py-4 px-6 text-center">{% include 'componentes/estado.html' with activo=c.activo %}</td>
+                <td class="py-4 px-6 text-center">
+                    {% url 'cliente_detalle' c.pk as url_ver %}{% url 'cliente_editar' c.pk as url_editar %}
+                    {% if puede_editar %}{% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %}{% else %}{% include 'componentes/acciones.html' with ver=url_ver %}{% endif %}
                 </td>
             </tr>
+            {% empty %}
+            {% include 'componentes/fila_vacia.html' with columnas=9 texto='Todavía no hay clientes registrados.' %}
+            {% endfor %}
         </tbody>
     </table>
+    </div>
+    {% include 'componentes/paginacion.html' %}
 </div>
 {% endblock %}
