@@ -1,0 +1,33 @@
+{# Tarjeta de producto reutilizable. Uso: {% include 'cliente/componentes/tarjeta_producto.html' with p=producto %} #}
+{% load static %}
+<article class="tarjeta flex flex-col p-2.5">
+    <div class="relative aspect-[4/3] rounded-xl bg-gradient-to-br from-rosa-50 to-rosa-100 flex items-center justify-center overflow-hidden">
+        {% if p.imagen %}
+            <img src="{% static p.imagen %}" alt="{{ p.marca }} {{ p.nombre }}" class="w-full h-full object-contain">
+        {% else %}
+            <i class="fa-solid {{ p.icono|default:'fa-wand-magic-sparkles' }} text-5xl text-rosa-300"></i>
+        {% endif %}
+        <button type="button" class="btn-favorito absolute top-2 right-2" aria-pressed="{% if p.favorito %}true{% else %}false{% endif %}" aria-label="Agregar {{ p.nombre }} a favoritos">
+            <i class="{% if p.favorito %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+        </button>
+    </div>
+
+    <div class="flex-1 flex flex-col px-1.5 pt-3">
+        <h3 class="text-[15px] leading-snug">{{ p.marca }}<br>{{ p.nombre }}</h3>
+
+        <div class="flex items-center gap-1 mt-2 text-sm" aria-label="Calificación {{ p.calificacion }} de 5">
+            <span class="text-amber-500 text-xs flex gap-0.5">
+                {% for estrella in p.estrellas %}
+                    {% if estrella == 'llena' %}<i class="fa-solid fa-star"></i>{% elif estrella == 'media' %}<i class="fa-solid fa-star-half-stroke"></i>{% else %}<i class="fa-regular fa-star"></i>{% endif %}
+                {% endfor %}
+            </span>
+            <span class="text-gray-600">({{ p.resenas }})</span>
+        </div>
+
+        <p class="font-bold text-lg mt-1.5">C$ {{ p.precio|floatformat:"2u" }}</p>
+
+        <button type="button" class="btn-carrito mt-3" data-producto="{{ p.id }}">
+            <i class="fa-solid fa-cart-plus"></i> <span>Agregar al carrito</span>
+        </button>
+    </div>
+</article>
