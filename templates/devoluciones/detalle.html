@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load napo %}
+
+{% block content %}
+<a href="{% url 'devoluciones' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a devoluciones</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-3xl font-extrabold text-gray-800">Devolución #{{ devolucion.pk }}</h1>
+            {% include 'devoluciones/estado_devolucion.html' with d=devolucion %}
+        </div>
+        <p class="text-gray-500 text-sm mt-1">Solicitada el {{ devolucion.fecha_solicitud|date:'d/m/Y h:i a' }} · Venta <a href="{% url 'venta_detalle' devolucion.venta_id %}" class="text-pink-600 hover:underline">{{ devolucion.venta.numero_factura }}</a></p>
+    </div>
+    {% if puede_editar %}<a href="{% url 'devolucion_editar' devolucion.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-5">Detalle de la solicitud</h2>
+            <dl class="grid grid-cols-2 md:grid-cols-3 gap-5">
+                {% include 'componentes/dato.html' with etiqueta='Motivo' valor=devolucion.get_motivo_display %}
+                {% include 'componentes/dato.html' with etiqueta='Resolución' valor=devolucion.get_tipo_resolucion_display %}
+                {% include 'componentes/dato.html' with etiqueta='Monto a reembolsar' valor=devolucion.monto_reembolso|cordobas %}
+                {% include 'componentes/dato.html' with etiqueta='Resuelta el' valor=devolucion.fecha_resolucion|date:'d/m/Y h:i a' %}
+                {% include 'componentes/dato.html' with etiqueta='Revisó' valor=devolucion.usuario %}
+            </dl>
+            {% if devolucion.descripcion %}
+            <div class="mt-6 pt-5 border-t border-gray-100">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Descripción</p>
+                <p class="text-sm text-gray-700 whitespace-pre-line">{{ devolucion.descripcion }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Productos devueltos</h2>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">Producto</th><th class="py-3 px-6 text-center">Cantidad</th><th class="py-3 px-6 text-right">Precio pagado</th><th class="py-3 px-6 text-center">Destino</th></tr>
+                </thead>
+                <tbody>
+                    {% for d in detalles %}
+                    <tr class="border-b border-gray-50">
+                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.detalle_venta.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.detalle_venta.producto.nombre }}</a><p class="text-xs text-gray-400">{{ d.detalle_venta.producto.marca.nombre }}</p></td>
+                        <td class="py-3 px-6 text-center">{{ d.cantidad }}</td>
+                        <td class="py-3 px-6 text-right whitespace-nowrap">{{ d.detalle_venta.precio_unitario|cordobas }}</td>
+                        <td class="py-3 px-6 text-center">{% if d.destino == 'Inventario' %}<span class="text-green-600 font-bold"><i class="fa-solid fa-box-open"></i> Regresa al stock</span>{% elif d.destino == 'Proveedor' %}<span class="text-blue-600 font-bold"><i class="fa-solid fa-truck-ramp-box"></i> Al proveedor</span>{% else %}<span class="text-gray-400"><i class="fa-solid fa-trash-can"></i> Dado de baja</span>{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=4 texto='Sin productos registrados.' %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        {% if al_proveedor %}
+        <div class="bg-blue-50 rounded-2xl border border-blue-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-3"><i class="fa-solid fa-truck-ramp-box text-blue-500 mr-2"></i>Enviado al proveedor</h2>
+            <ul class="space-y-2 text-sm">
+                {% for dp in al_proveedor %}
+                <li class="flex justify-between gap-3"><a href="{% url 'devolucion_proveedor_detalle' dp.pk %}" class="font-medium text-gray-800 hover:text-pink-600">#{{ dp.pk }} · {{ dp.proveedor.nombre_empresa }}</a>{% include 'devoluciones/estado_proveedor.html' with d=dp %}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Cliente</h2>
+            {% if devolucion.venta.cliente %}
+            <a href="{% url 'cliente_detalle' devolucion.venta.cliente_id %}" class="font-bold text-gray-800 hover:text-pink-600">{{ devolucion.venta.cliente }}</a>
+            <p class="text-sm text-gray-500">{{ devolucion.venta.cliente.correo|default:'' }}</p>
+            <p class="text-sm text-gray-500">{{ devolucion.venta.cliente.telefono|default:'' }}</p>
+            {% else %}<p class="text-sm text-gray-400">Cliente de mostrador</p>{% endif %}
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Venta original</h2>
+            <dl class="space-y-4">
+                {% include 'componentes/dato.html' with etiqueta='Factura' valor=devolucion.venta.numero_factura %}
+                {% include 'componentes/dato.html' with etiqueta='Fecha' valor=devolucion.venta.fecha|date:'d/m/Y' %}
+                {% include 'componentes/dato.html' with etiqueta='Total' valor=devolucion.venta.total|cordobas %}
+                {% include 'componentes/dato.html' with etiqueta='Método de pago' valor=devolucion.venta.metodo_pago.nombre %}
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}
