@@ -1,0 +1,97 @@
+{% extends 'cliente/base_cliente.html' %}
+
+{% block titulo %}Mi cuenta{% endblock %}
+
+{% block contenido %}
+<!-- Encabezado -->
+<h1 class="font-titulo font-extrabold text-3xl sm:text-[2.35rem] leading-tight">Mi cuenta</h1>
+<p class="mt-1 text-[15px] text-gray-700">Gestiona tus pedidos, direcciones, recompensas y mucho más.</p>
+
+<!-- Accesos rápidos -->
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mt-5" aria-label="Accesos rápidos">
+    <a href="#" class="tarjeta acceso-rapido">
+        <span class="circulo-icono w-11 h-11 text-lg"><i class="fa-solid fa-box-open"></i></span>
+        <span class="flex-1 min-w-0">
+            <span class="block font-bold text-[15px]">Mis pedidos</span>
+            <span class="block text-xs text-gray-600 mt-0.5">Revisa y rastrea tus compras</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+    </a>
+    <a href="#" class="tarjeta acceso-rapido">
+        <span class="circulo-icono w-11 h-11 text-lg"><i class="fa-regular fa-heart"></i></span>
+        <span class="flex-1 min-w-0">
+            <span class="block font-bold text-[15px]">Mis favoritos</span>
+            <span class="block text-xs text-gray-600 mt-0.5">{{ total_favoritos }} productos guardados</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+    </a>
+    <a href="#" class="tarjeta acceso-rapido">
+        <span class="circulo-icono w-11 h-11 text-lg"><i class="fa-solid fa-gift"></i></span>
+        <span class="flex-1 min-w-0">
+            <span class="block font-bold text-[15px]">Recompensas y Puntos</span>
+            <span class="block text-sm mt-0.5">{{ puntos }} Puntos</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+    </a>
+    <a href="#" class="tarjeta acceso-rapido">
+        <span class="circulo-icono w-11 h-11 text-lg"><i class="fa-solid fa-location-dot"></i></span>
+        <span class="flex-1 min-w-0">
+            <span class="block font-bold text-[15px]">Direcciones</span>
+            <span class="block text-xs text-gray-600 mt-0.5">Gestiona tus direcciones de envío</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs"></i>
+    </a>
+</section>
+
+<!-- Pedidos recientes -->
+<section class="mt-8" aria-labelledby="titulo-pedidos">
+    <div class="flex items-end justify-between gap-4 mb-3">
+        <h2 id="titulo-pedidos" class="font-titulo font-bold text-2xl">Pedidos recientes</h2>
+        <a href="#" class="ver-mas">Ver todos <i class="fa-solid fa-arrow-right text-xs"></i></a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        {% for pedido in pedidos %}
+        {% include 'cliente/componentes/tarjeta_pedido.html' %}
+        {% empty %}
+        <p class="text-sm text-gray-600 col-span-full">Aún no tienes pedidos.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Recomendaciones + puntos -->
+<section class="mt-8" aria-labelledby="titulo-recomendaciones">
+    <div class="flex items-end justify-between gap-4 mb-3">
+        <h2 id="titulo-recomendaciones" class="font-titulo font-bold text-2xl">Recomendaciones para ti</h2>
+        <a href="#" class="ver-mas">Ver más <i class="fa-solid fa-arrow-right text-xs"></i></a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 items-start">
+        {% for producto in recomendaciones %}
+            {% include 'cliente/componentes/tarjeta_producto.html' with p=producto %}
+        {% endfor %}
+
+        <!-- Puntos y recompensas -->
+        <aside class="tarjeta p-4 sm:col-span-2 lg:col-span-3 xl:col-span-1" aria-label="Tus puntos y recompensas">
+            <h3 class="font-medium text-[17px]">Tus puntos y recompensas</h3>
+            <p class="font-medium text-[1.65rem] mt-3">{{ puntos }} Puntos</p>
+            <ul class="mt-4 space-y-5">
+                {% for meta in metas %}
+                <li>
+                    <div class="flex items-center gap-2.5 text-sm">
+                        <i class="fa-solid {{ meta.icono }} w-5 text-center"></i>
+                        <span>{{ meta.texto }}</span>
+                    </div>
+                    <div class="barra-progreso mt-2" role="progressbar" aria-valuemin="0" aria-valuemax="{{ meta.meta }}" aria-valuenow="{{ puntos }}" aria-label="{{ meta.texto }}">
+                        <span style="width: {{ meta.porcentaje }}%"></span>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1.5">
+                        {% if meta.faltan %}Te faltan {{ meta.faltan }} puntos{% else %}¡Ya puedes canjearlo!{% endif %}
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+    </div>
+</section>
+{% endblock %}
