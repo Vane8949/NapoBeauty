@@ -2,6 +2,7 @@
 Django settings for core project.
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -55,11 +56,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Database
+# Base de datos: SQL Server (paquete mssql-django)
+# Por defecto usa la base NapoBeauty en este equipo con autenticación de Windows.
+# Si alguien del equipo usa otro servidor o el usuario 'sa', puede definir estas
+# variables de entorno en su PC sin tocar este archivo:
+#   DB_HOST, DB_NAME, DB_USER, DB_PASSWORD
+# (si DB_USER queda vacío se usa la autenticación de Windows).
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': os.environ.get('DB_NAME', 'NapoBeauty'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': '',
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'OPTIONS': {
+            # Driver de Microsoft para Python: trae su propio controlador ODBC
+            'python_driver': 'mssql_python',
+            # El certificado del SQL Server local no es de confianza: solo para desarrollo
+            'extra_params': 'Encrypt=yes;TrustServerCertificate=yes',
+        },
     }
 }
 
@@ -75,7 +91,10 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-ni'  # <-- Español de Nicaragua
 TIME_ZONE = 'America/Managua' # <-- Zona horaria local
 USE_I18N = True
-USE_TZ = True
+# Las fechas se guardan en hora local de Managua, igual que los valores por defecto
+# de SQL Server (SYSDATETIME()). Con True, Django las guardaría en UTC (6 horas de
+# diferencia) y los reportes por día se descuadrarían.
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
