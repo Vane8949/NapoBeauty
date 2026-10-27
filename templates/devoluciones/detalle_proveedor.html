@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load napo %}
+
+{% block content %}
+<a href="{% url 'devoluciones_proveedor' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-pink-600 mb-4"><i class="fa-solid fa-arrow-left text-xs"></i> Volver a devoluciones a proveedores</a>
+
+<div class="mb-6 flex flex-wrap justify-between items-start gap-4">
+    <div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-3xl font-extrabold text-gray-800">Devolución a proveedor #{{ dp.pk }}</h1>
+            {% include 'devoluciones/estado_proveedor.html' with d=dp %}
+        </div>
+        <p class="text-gray-500 text-sm mt-1">Registrada el {{ dp.fecha|date:'d/m/Y h:i a' }} · {{ dp.get_origen_display }}{% if dp.devolucion_id %} (<a href="{% url 'devolucion_detalle' dp.devolucion_id %}" class="text-pink-600 hover:underline">devolución #{{ dp.devolucion_id }}</a>){% endif %}</p>
+    </div>
+    {% if puede_editar %}<a href="{% url 'devolucion_proveedor_editar' dp.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
+</div>
+
+{% if not dp.activo %}
+<div class="mb-6 px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 text-gray-600 text-sm"><i class="fa-solid fa-ban mr-2"></i>Esta devolución está anulada{% if dp.origen == 'Inventario' %}: sus productos regresaron al inventario{% endif %}.</div>
+{% elif dp.estado == 'Rechazada' %}
+<div class="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm"><i class="fa-solid fa-circle-xmark mr-2"></i>El proveedor rechazó la devolución: los productos quedan dados de baja como pérdida.</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-5">Detalle</h2>
+            <dl class="grid grid-cols-2 md:grid-cols-3 gap-5">
+                {% include 'componentes/dato.html' with etiqueta='Motivo' valor=dp.get_motivo_display %}
+                {% include 'componentes/dato.html' with etiqueta='Resolución esperada' valor=dp.get_resolucion_display %}
+                {% include 'componentes/dato.html' with etiqueta='Monto acreditado' valor=dp.monto_credito|cordobas %}
+                {% include 'componentes/dato.html' with etiqueta='Factura del proveedor' valor=dp.factura_proveedor %}
+                {% include 'componentes/dato.html' with etiqueta='Resuelta el' valor=dp.fecha_resolucion|date:'d/m/Y h:i a' %}
+                {% include 'componentes/dato.html' with etiqueta='Registró / resolvió' valor=dp.usuario %}
+            </dl>
+            {% if dp.descripcion %}
+            <div class="mt-6 pt-5 border-t border-gray-100">
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Descripción</p>
+                <p class="text-sm text-gray-700 whitespace-pre-line">{{ dp.descripcion }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="font-bold text-gray-800 px-6 py-4 border-b border-gray-100">Productos devueltos</h2>
+            <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+                    <tr><th class="py-3 px-6">Producto</th><th class="py-3 px-6 text-center">Cantidad</th><th class="py-3 px-6 text-right">Costo unitario</th><th class="py-3 px-6 text-right">Subtotal</th></tr>
+                </thead>
+                <tbody>
+                    {% for d in detalles %}
+                    <tr class="border-b border-gray-50">
+                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.producto.nombre }}</a><p class="text-xs text-gray-400">{{ d.producto.marca.nombre }} · {{ d.producto.sku }}</p></td>
+                        <td class="py-3 px-6 text-center">{{ d.cantidad }}</td>
+                        <td class="py-3 px-6 text-right whitespace-nowrap">{{ d.costo_unitario|cordobas }}</td>
+                        <td class="py-3 px-6 text-right font-bold whitespace-nowrap">{{ d.subtotal|cordobas }}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'componentes/fila_vacia.html' with columnas=4 texto='Sin productos registrados.' %}
+                    {% endfor %}
+                </tbody>
+                {% if detalles %}
+                <tfoot><tr class="font-extrabold text-gray-900"><td class="py-3 px-6">Total al costo</td><td class="py-3 px-6 text-center">{{ totales.unidades }}</td><td></td><td class="py-3 px-6 text-right whitespace-nowrap">{{ totales.costo|cordobas }}</td></tr></tfoot>
+                {% endif %}
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Proveedor</h2>
+            <a href="{% url 'proveedor_detalle' dp.proveedor_id %}" class="font-bold text-gray-800 hover:text-pink-600">{{ dp.proveedor.nombre_empresa }}</a>
+            <p class="text-sm text-gray-500">{{ dp.proveedor.nombre_contacto|default:'' }}</p>
+            <p class="text-sm text-gray-500">{{ dp.proveedor.telefono|default:'' }}</p>
+            <p class="text-sm text-gray-500">{{ dp.proveedor.correo|default:'' }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-sm text-gray-600 space-y-2">
+            <h2 class="font-bold text-gray-800 mb-2">¿Qué pasa con el stock?</h2>
+            {% if dp.origen == 'Inventario' %}<p><i class="fa-solid fa-arrow-down text-red-400 mr-2"></i>Las unidades salieron del inventario al registrarla.</p>
+            {% else %}<p><i class="fa-solid fa-user text-pink-400 mr-2"></i>Las devolvió un cliente: nunca volvieron al inventario.</p>{% endif %}
+            <p><i class="fa-solid fa-arrow-up text-green-500 mr-2"></i>Si el proveedor repone el producto, al marcarla Completada las unidades entran al stock.</p>
+            <p><i class="fa-solid fa-receipt text-purple-400 mr-2"></i>Con nota de crédito o reembolso, el stock no cambia: anota el monto acreditado.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
