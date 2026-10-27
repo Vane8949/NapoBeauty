@@ -1,0 +1,7 @@
+{# Botones Ver / Editar de cada fila. Uso: {% include 'componentes/acciones.html' with ver=url_ver editar=url_editar %} #}
+<div class="flex items-center justify-center gap-1 whitespace-nowrap">
+    <a href="{{ ver }}" class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-pink-500 hover:bg-pink-50 transition" title="Ver detalles" aria-label="Ver detalles"><i class="fa-regular fa-eye"></i></a>
+    {% if editar %}
+    <a href="{{ editar }}" data-modal class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition" title="{{ titulo_editar|default:'Editar' }}" aria-label="{{ titulo_editar|default:'Editar' }}"><i class="fa-solid {{ icono_editar|default:'fa-pen' }}"></i></a>
+    {% endif %}
+</div>
