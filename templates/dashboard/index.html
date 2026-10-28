@@ -175,15 +175,15 @@
                     {% for p in bajo_stock %}
                     <tr class="border-b border-gray-50 last:border-0 hover:bg-pink-50 transition">
                         <td class="py-3">
-                            {% if p.fotos %}<img src="{{ p.fotos.0.ruta.url }}" alt="" class="w-10 h-10 rounded-lg object-cover bg-pink-50">
+                            {% if p.producto.fotos %}<img src="{{ p.producto.fotos.0.ruta.url }}" alt="" class="w-10 h-10 rounded-lg object-cover bg-pink-50">
                             {% else %}<div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-400"><i class="fa-solid fa-image"></i></div>{% endif %}
                         </td>
-                        <td class="py-3"><a href="{% url 'inventario_detalle' p.pk %}" class="font-medium text-gray-800 hover:text-pink-600">{{ p.nombre }}</a><p class="text-xs text-gray-400">{{ p.marca.nombre }} · mínimo {{ p.stock_minimo }}</p></td>
+                        <td class="py-3"><a href="{% url 'inventario_detalle' p.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ p.producto.nombre }}</a> {% include 'componentes/tono.html' with v=p %}<p class="text-xs text-gray-400">{{ p.producto.marca.nombre }} · mínimo {{ p.stock_minimo }}</p></td>
                         <td class="py-3 text-center font-extrabold {% if p.stock_actual == 0 %}text-red-600{% else %}text-red-500{% endif %}">{{ p.stock_actual }}</td>
                         <td class="py-3 text-center whitespace-nowrap">
                             {% if p.stock_actual == 0 %}<span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold">Agotado</span>
                             {% else %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold">Bajo stock</span>{% endif %}
-                            <a href="{% url 'inventario_detalle' p.pk %}" aria-label="Ver inventario"><i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></a>
+                            <a href="{% url 'inventario_detalle' p.producto_id %}" aria-label="Ver inventario"><i class="fa-solid fa-chevron-right text-gray-300 ml-2 text-xs"></i></a>
                         </td>
                     </tr>
                     {% empty %}
