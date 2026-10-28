@@ -78,7 +78,7 @@
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
                 <td class="py-4 px-6">
                     <a href="{% url 'producto_detalle' p.pk %}" class="font-bold text-gray-800 hover:text-pink-600">{{ p.nombre }}</a>
-                    <p class="text-xs text-gray-400">SKU: {{ p.sku }}</p>
+                    <p class="text-xs text-gray-400">SKU: {{ p.sku }}{% if p.num_tonos %} · <span class="text-pink-500 font-semibold">{{ p.num_tonos }} tono{{ p.num_tonos|pluralize }}</span>{% endif %}</p>
                 </td>
                 <td class="py-4 px-6 text-gray-500">
                     {{ p.categoria.nombre }}
@@ -88,7 +88,7 @@
                 <td class="py-4 px-6 font-bold whitespace-nowrap">{{ p.precio_venta|cordobas }}</td>
                 <td class="py-4 px-6 text-center">
                     {% if p.stock_actual == 0 %}<span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">Agotado</span>
-                    {% elif p.stock_bajo %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ p.stock_actual }} (Bajo)</span>
+                    {% elif p.stock_bajo %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ p.stock_actual }} ({% if p.num_tonos %}Tono bajo{% else %}Bajo{% endif %})</span>
                     {% else %}<span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold whitespace-nowrap">{{ p.stock_actual }} (En stock)</span>{% endif %}
                 </td>
                 <td class="py-4 px-6 text-center">{% include 'componentes/estado.html' with activo=p.activo %}</td>
