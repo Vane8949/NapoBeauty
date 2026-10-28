@@ -14,6 +14,7 @@ urlpatterns = [
     path('productos/nuevo/', productos.crear_producto, name='producto_crear'),
     path('productos/<int:pk>/', productos.detalle_producto, name='producto_detalle'),
     path('productos/<int:pk>/editar/', productos.editar_producto, name='producto_editar'),
+    path('productos/<int:pk>/unir-tono/', productos.unir_tono, name='producto_unir_tono'),
 
     # Inventario (el "editar" de inventario es ajustar el stock)
     path('inventario/', inventario.panel_inventario, name='inventario'),
