@@ -1,0 +1,25 @@
+{% comment %}Tonos de "Agregar / Editar producto". Solo se ven con "Varios tonos con stock propio". Filas nuevas: static/js/modales.js{% endcomment %}
+<div class="sm:col-span-2" data-mostrar-si="tiene_tonos=si" data-tonos data-prefijo="{{ tonos.prefix }}">
+    {{ tonos.management_form }}
+    <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-800">Tonos <span class="text-pink-500">*</span></p>
+        <button type="button" data-agregar-tono class="text-sm font-bold text-pink-600 hover:text-pink-700 inline-flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Agregar tono</button>
+    </div>
+
+    {% if tonos.non_form_errors %}
+    <div class="mb-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+        {% for error in tonos.non_form_errors %}<p><i class="fa-solid fa-circle-exclamation mr-2"></i>{{ error }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="rounded-xl border border-gray-100 overflow-hidden">
+        <div class="hidden sm:grid grid-cols-[3.25rem_1fr_7rem_5rem_5rem_3rem] gap-2.5 px-3 py-2 bg-pink-50/60 text-xs font-bold text-gray-500">
+            <span>Foto</span><span>Tono</span><span>SKU</span><span>Stock</span><span>Mínimo</span><span class="text-center">Activo</span>
+        </div>
+        <div data-lista-tonos class="divide-y divide-gray-50">
+            {% for tono in tonos %}{% include 'productos/tono.html' %}{% endfor %}
+        </div>
+    </div>
+    <template data-plantilla-tono>{% include 'productos/tono.html' with tono=tonos.empty_form %}</template>
+    <p class="text-xs text-gray-400 mt-2">Cada tono puede tener su foto y su SKU. El stock del producto es la suma de sus tonos y la alerta de bajo stock es por tono. Los tonos no se borran: para dejar de vender uno, pon su stock en 0 y desmarca Activo.</p>
+</div>
