@@ -14,6 +14,7 @@
     </div>
     <div class="flex gap-3">
         <a href="{% url 'inventario_detalle' producto.pk %}" class="bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2.5 rounded-xl font-bold text-sm inline-flex items-center gap-2"><i class="fa-solid fa-boxes-stacked"></i> Ver inventario</a>
+        {% if puede_editar and producto.activo %}<a href="{% url 'producto_unir_tono' producto.pk %}" data-modal class="bg-white border border-pink-200 text-pink-600 hover:bg-pink-50 px-4 py-2.5 rounded-xl font-bold text-sm inline-flex items-center gap-2" title="Si otro tono de este producto se registró como producto aparte, únelo aquí"><i class="fa-solid fa-palette"></i> Unir otro tono</a>{% endif %}
         {% if puede_editar %}<a href="{% url 'producto_editar' producto.pk %}" data-modal class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm inline-flex items-center gap-2"><i class="fa-solid fa-pen"></i> Editar</a>{% endif %}
     </div>
 </div>
@@ -23,9 +24,28 @@
     <div class="space-y-6">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
             <div class="aspect-square rounded-xl bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center overflow-hidden">
-                {% if imagen %}<img src="{{ imagen.ruta.url }}" alt="{{ producto.nombre }}" class="w-full h-full object-contain">
+                {% if foto_principal %}<img data-foto-principal src="{{ foto_principal }}" alt="{{ producto.nombre }}" class="w-full h-full object-contain">
                 {% else %}<div class="text-center text-pink-300"><i class="fa-solid fa-image text-5xl"></i><p class="text-xs mt-2">Sin foto</p></div>{% endif %}
             </div>
+            {% if fotos_tonos %}
+            <p class="mt-3 text-sm text-gray-600">Tono: <span data-nombre-foto class="font-bold text-gray-800">{{ nombre_foto }}</span></p>
+            <div class="mt-2 flex flex-wrap gap-2" aria-label="Fotos por tono">
+                {% for v in fotos_tonos %}
+                <button type="button" data-ver-foto="{{ v.imagen.url }}" data-nombre="{{ v.nombre }}" title="{{ v.nombre }}" aria-label="Ver tono {{ v.nombre }}"
+                        class="w-16 h-16 rounded-xl overflow-hidden border-2 {% if forloop.first %}border-pink-400{% else %}border-transparent{% endif %} hover:border-pink-300 transition-colors"><img src="{{ v.imagen.url }}" alt="" class="w-full h-full object-cover"></button>
+                {% endfor %}
+            </div>
+            <script>
+            document.querySelectorAll('[data-ver-foto]').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    document.querySelector('[data-foto-principal]').src = b.dataset.verFoto;
+                    document.querySelector('[data-nombre-foto]').textContent = b.dataset.nombre;
+                    document.querySelectorAll('[data-ver-foto]').forEach(function (o) { o.classList.replace('border-pink-400', 'border-transparent'); });
+                    b.classList.replace('border-transparent', 'border-pink-400');
+                });
+            });
+            </script>
+            {% endif %}
         </div>
         <div class="grid grid-cols-2 gap-4">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
@@ -58,7 +78,7 @@
                     <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Stock actual</dt>
                     <dd class="mt-1 text-sm font-bold {% if producto.stock_actual == 0 %}text-red-600{% elif producto.stock_bajo %}text-yellow-600{% else %}text-green-600{% endif %}">{{ producto.stock_actual }} unidades</dd>
                 </div>
-                {% include 'componentes/dato.html' with etiqueta='Stock mínimo' valor=producto.stock_minimo %}
+                {% if tonos %}{% include 'componentes/dato.html' with etiqueta='Tonos' valor=tonos|length %}{% else %}{% include 'componentes/dato.html' with etiqueta='Stock mínimo' valor=producto.stock_minimo %}{% endif %}
                 {% include 'componentes/dato.html' with etiqueta='Registrado el' valor=producto.fecha_creacion|date:'d/m/Y' %}
             </dl>
             {% if producto.descripcion %}
@@ -68,6 +88,8 @@
             </div>
             {% endif %}
         </div>
+
+        {% include 'componentes/tabla_tonos.html' with puede_ajustar=False %}
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="px-6 py-4 flex justify-between items-center border-b border-gray-100">
