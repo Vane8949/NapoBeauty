@@ -57,7 +57,7 @@ def panel_devoluciones_proveedor(request):
 def detalle_devolucion_proveedor(request, pk):
     dp = get_object_or_404(
         DevolucionProveedor.objects.select_related('proveedor', 'devolucion__venta', 'usuario'), pk=pk)
-    detalles = dp.detalles.select_related('producto__marca')
+    detalles = dp.detalles.select_related('producto__marca', 'variante')
     return render(request, 'devoluciones/detalle_proveedor.html', {
         'dp': dp, 'detalles': detalles,
         'totales': detalles.aggregate(unidades=Sum('cantidad'), costo=Sum('subtotal')),
