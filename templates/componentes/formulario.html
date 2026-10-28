@@ -4,6 +4,7 @@ y también como página completa si el navegador no tiene JavaScript (pagina_for
 
 Contexto: form, titulo, icono, accion, volver_url, texto_boton
 Opcional: subtitulo, resumen [(etiqueta, valor)], ancho ('lg' | 'xl'), imagen_actual, seccion_extra (plantilla)
+Un campo con .seccion_despues (plantilla) dibuja esa sección justo debajo de él (ej. los tonos de un producto).
 {% endcomment %}
 <div class="bg-white rounded-2xl shadow-2xl w-full {% if ancho == 'xl' %}max-w-3xl{% elif ancho == 'lg' %}max-w-2xl{% else %}max-w-xl{% endif %} max-h-[92vh] flex flex-col {% if en_pagina %}mx-auto{% endif %}">
     <!-- Encabezado -->
@@ -44,7 +45,7 @@ Opcional: subtitulo, resumen [(etiqueta, valor)], ancho ('lg' | 'xl'), imagen_ac
                 <div class="{% if campo.field.ancho or campo.widget_type == 'checkbox' %}sm:col-span-2{% endif %}"{% if campo.field.mostrar_si %} data-mostrar-si="{{ campo.field.mostrar_si }}"{% endif %}>
                     {% if campo.widget_type == 'radioselect' %}
                     <p class="block text-sm font-medium text-gray-700 mb-1">{{ campo.label }}</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 gap-2" style="grid-template-columns:repeat({{ campo.field.choices|length }},minmax(0,1fr))">
                         {% for opcion in campo %}
                         <label class="cursor-pointer">
                             {{ opcion.tag }}
@@ -83,6 +84,7 @@ Opcional: subtitulo, resumen [(etiqueta, valor)], ancho ('lg' | 'xl'), imagen_ac
                     {% endif %}
                     {% for error in campo.errors %}<p class="text-xs text-red-600 mt-1"><i class="fa-solid fa-circle-exclamation mr-1"></i>{{ error }}</p>{% endfor %}
                 </div>
+                {% if campo.field.seccion_despues %}{% include campo.field.seccion_despues %}{% endif %}
                 {% endif %}{% endfor %}
             </div>
 
