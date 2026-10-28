@@ -1,0 +1,28 @@
+{# Una fila de tono. Variable: tono (formulario del formset de tonos) #}
+<div data-tono class="grid grid-cols-[3.25rem_1fr] sm:grid-cols-[3.25rem_1fr_7rem_5rem_5rem_3rem] gap-2.5 px-3 py-3 items-start">
+    {{ tono.id }}
+    <label for="{{ tono.imagen.id_for_label }}" class="row-span-2 sm:row-span-1 w-12 h-12 rounded-lg border-2 border-dashed border-pink-200 bg-pink-50/50 hover:border-pink-400 flex items-center justify-center overflow-hidden cursor-pointer" title="Foto del tono (opcional)">
+        <img data-foto-tono src="{{ tono.initial.imagen_url|default:'' }}" alt="" class="{% if not tono.initial.imagen_url %}hidden {% endif %}w-full h-full object-cover">
+        <i data-icono-foto class="{% if tono.initial.imagen_url %}hidden {% endif %}fa-solid fa-camera text-pink-300"></i>
+        {{ tono.imagen }}
+    </label>
+    <div>
+        {{ tono.nombre }}
+        {% for campo in tono %}{% for error in campo.errors %}<p class="text-xs text-red-600 mt-1">{{ campo.label }}: {{ error }}</p>{% endfor %}{% endfor %}
+    </div>
+    <div class="col-start-2 sm:col-start-auto">
+        <label class="sm:hidden text-[11px] font-bold text-gray-500" for="{{ tono.sku.id_for_label }}">SKU</label>
+        {{ tono.sku }}
+    </div>
+    <div class="col-start-2 sm:col-start-auto">
+        <label class="sm:hidden text-[11px] font-bold text-gray-500" for="{{ tono.stock.id_for_label }}">Stock</label>
+        {{ tono.stock }}
+    </div>
+    <div class="col-start-2 sm:col-start-auto">
+        <label class="sm:hidden text-[11px] font-bold text-gray-500" for="{{ tono.stock_minimo.id_for_label }}">Mínimo</label>
+        {{ tono.stock_minimo }}
+    </div>
+    <label class="col-start-2 sm:col-start-auto flex items-center sm:justify-center gap-2 pt-2.5 cursor-pointer">
+        {{ tono.activo }}<span class="sm:hidden text-sm text-gray-600">Activo</span>
+    </label>
+</div>
