@@ -6,7 +6,7 @@ from django.db.models import Count, F, Prefetch, Sum
 from django.shortcuts import render
 from django.utils import timezone
 
-from app.models import Cliente, DetalleVenta, Producto, ProductoImagen, Venta
+from app.models import Cliente, DetalleVenta, Producto, ProductoImagen, VarianteProducto, Venta
 
 from .comun import tiene_permiso
 
@@ -94,9 +94,12 @@ def panel_principal(request):
     }
 
     # --- Listas ---
-    imagenes = Prefetch('imagenes', queryset=ProductoImagen.objects.filter(activo=True), to_attr='fotos')
-    bajo_stock = (productos.filter(stock_actual__lte=F('stock_minimo')).select_related('marca')
-                  .prefetch_related(imagenes).order_by('stock_actual', 'nombre'))
+    # Bajo stock por tono: un labial puede tener el rojo agotado aunque queden otros tonos
+    imagenes = Prefetch('producto__imagenes', queryset=ProductoImagen.objects.filter(activo=True), to_attr='fotos')
+    bajo_stock = (VarianteProducto.objects.filter(activo=True, producto__activo=True,
+                                                  stock_actual__lte=F('stock_minimo'))
+                  .select_related('producto__marca').prefetch_related(imagenes)
+                  .order_by('stock_actual', 'producto__nombre', 'orden'))
 
     contexto = {
         'ahora': ahora,
