@@ -1,0 +1,2 @@
+{# Etiqueta de un tono con su color. Variable: v (VarianteProducto). No muestra nada si el producto no tiene tonos. #}
+{% if v and not v.es_unica %}<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 text-[11px] font-semibold align-middle whitespace-nowrap">{{ v.nombre }}</span>{% endif %}
