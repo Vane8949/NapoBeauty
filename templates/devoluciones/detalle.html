@@ -44,7 +44,7 @@
                 <tbody>
                     {% for d in detalles %}
                     <tr class="border-b border-gray-50">
-                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.detalle_venta.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.detalle_venta.producto.nombre }}</a><p class="text-xs text-gray-400">{{ d.detalle_venta.producto.marca.nombre }}</p></td>
+                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.detalle_venta.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.detalle_venta.producto.nombre }}</a> {% include 'componentes/tono.html' with v=d.detalle_venta.variante %}<p class="text-xs text-gray-400">{{ d.detalle_venta.producto.marca.nombre }}</p></td>
                         <td class="py-3 px-6 text-center">{{ d.cantidad }}</td>
                         <td class="py-3 px-6 text-right whitespace-nowrap">{{ d.detalle_venta.precio_unitario|cordobas }}</td>
                         <td class="py-3 px-6 text-center">{% if d.destino == 'Inventario' %}<span class="text-green-600 font-bold"><i class="fa-solid fa-box-open"></i> Regresa al stock</span>{% elif d.destino == 'Proveedor' %}<span class="text-blue-600 font-bold"><i class="fa-solid fa-truck-ramp-box"></i> Al proveedor</span>{% else %}<span class="text-gray-400"><i class="fa-solid fa-trash-can"></i> Dado de baja</span>{% endif %}</td>
