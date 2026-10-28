@@ -71,6 +71,7 @@
     function activar(contenedor) {
         activarImagenes(contenedor);
         activarLineasVenta(contenedor);
+        activarTonos(contenedor);
         activarMostrarSi(contenedor);
 
         // Selects que vuelven a cargar el formulario al cambiar (ej. la venta de una devolución)
@@ -156,6 +157,37 @@
 
     function formatoCordobas(valor) {
         return 'C$ ' + valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Tonos de un producto: "Agregar tono" copia la fila vacía de la plantilla
+    function activarTonos(contenedor) {
+        const bloque = contenedor.querySelector('[data-tonos]');
+        if (!bloque) return;
+        const lista = bloque.querySelector('[data-lista-tonos]');
+        const plantilla = bloque.querySelector('template[data-plantilla-tono]');
+        const totalForms = bloque.querySelector('#id_' + bloque.dataset.prefijo + '-TOTAL_FORMS');
+        // Vista previa de la foto de cada tono (también en las filas que se agregan después)
+        lista.addEventListener('change', function (e) {
+            if (e.target.type !== 'file' || !e.target.files.length) return;
+            const fila = e.target.closest('[data-tono]');
+            const archivo = e.target.files[0];
+            if (archivo.size > 2 * 1024 * 1024) { e.target.value = ''; alertaFoto(fila); return; }
+            const foto = fila.querySelector('[data-foto-tono]');
+            foto.src = URL.createObjectURL(archivo);
+            foto.classList.remove('hidden');
+            fila.querySelector('[data-icono-foto]').classList.add('hidden');
+        });
+        function alertaFoto(fila) {
+            const nombre = fila.querySelector('input[name$="-nombre"]');
+            if (nombre) { nombre.setCustomValidity('La foto pesa más de 2 MB.'); nombre.reportValidity(); nombre.setCustomValidity(''); }
+        }
+        bloque.querySelector('[data-agregar-tono]').addEventListener('click', function () {
+            const indice = parseInt(totalForms.value, 10);
+            lista.insertAdjacentHTML('beforeend', plantilla.innerHTML.replace(/__prefix__/g, indice));
+            totalForms.value = indice + 1;
+            const nombre = lista.lastElementChild.querySelector('input[name$="-nombre"]');
+            if (nombre) nombre.focus();
+        });
     }
 
     function activarLineasVenta(contenedor) {
