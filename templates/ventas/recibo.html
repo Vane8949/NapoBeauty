@@ -75,6 +75,7 @@
         {% for d in detalles %}
         <div class="producto">
             <div class="nombre">{{ d.producto.nombre }}</div>
+            {% if d.tono %}<div class="pequeno">Tono: {{ d.tono }}</div>{% endif %}
             <div class="fila pequeno"><span>{{ d.cantidad }} x {{ d.precio_unitario|cordobas }}{% if d.descuento %} (−{{ d.descuento|cordobas }}){% endif %}</span><span>{{ d.subtotal|cordobas }}</span></div>
         </div>
         {% endfor %}
