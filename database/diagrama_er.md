@@ -11,7 +11,7 @@ Este diagrama se ve como imagen en GitHub y en VS Code (con la extensión
 | Módulo | Tablas | Pantallas que lo usan |
 |---|---|---|
 | Seguridad | Rol, Permiso, RolPermiso, Usuario | Login, Usuarios (asignar permisos por rol) |
-| Catálogo | Categoria, Marca, Proveedor, Producto, ProductoImagen | Productos, Proveedores, menú de categorías |
+| Catálogo | Categoria, Marca, Proveedor, Producto, VarianteProducto, ProductoImagen | Productos, Proveedores, menú de categorías |
 | Inventario | Compra, DetalleCompra, MovimientoInventario | Inventario |
 | Clientes | Cliente, DireccionCliente, MetodoPagoCliente | Clientes, Mi cuenta, Direcciones, Métodos de pago |
 | Vista cliente | Favorito, ListaDeseo, CarritoItem, Resena | Favoritos, Lista de deseos, Carrito, estrellas |
@@ -63,6 +63,9 @@ erDiagram
     Venta ||--o{ Devolucion : "genera"
     Devolucion ||--|{ DetalleDevolucion : "incluye"
     DetalleVenta ||--o{ DetalleDevolucion : "devuelto en"
+    Producto ||--|{ VarianteProducto : "tiene tonos"
+    VarianteProducto ||--o{ DetalleVenta : "vendida en"
+    VarianteProducto ||--o{ MovimientoInventario : "mueve stock de"
     Proveedor ||--o{ DevolucionProveedor : "recibe"
     Devolucion ||--o{ DevolucionProveedor : "se envía en"
     DevolucionProveedor ||--|{ DetalleDevolucionProveedor : "incluye"
@@ -211,6 +214,16 @@ erDiagram
         decimal Total
         nvarchar Estado
         bit Activo
+    }
+    VarianteProducto {
+        int VarianteProductoId PK
+        int ProductoId FK
+        nvarchar Nombre
+        nvarchar ColorHex
+        nvarchar SKU
+        nvarchar Imagen
+        int StockActual
+        int StockMinimo
     }
     DetalleVenta {
         int DetalleVentaId PK
