@@ -55,7 +55,7 @@ def detalle_devolucion(request, pk):
         Devolucion.objects.select_related('venta__cliente', 'venta__metodo_pago', 'usuario'), pk=pk)
     return render(request, 'devoluciones/detalle.html', {
         'devolucion': devolucion,
-        'detalles': devolucion.detalles.select_related('detalle_venta__producto__marca'),
+        'detalles': devolucion.detalles.select_related('detalle_venta__producto__marca', 'detalle_venta__variante'),
         'al_proveedor': devolucion.devoluciones_proveedor.select_related('proveedor'),
         'puede_editar': tiene_permiso(request, 'devoluciones.editar'),
     })
