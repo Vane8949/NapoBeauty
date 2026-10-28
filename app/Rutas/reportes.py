@@ -16,7 +16,7 @@ from django.utils import timezone
 
 from app.models import (
     Categoria, DetalleDevolucion, DetalleDevolucionProveedor, DetalleVenta, Devolucion, DevolucionProveedor, Producto,
-    Venta,
+    Venta, con_tonos,
 )
 
 from .comun import paginar, requiere_permiso, tiene_permiso
@@ -286,7 +286,7 @@ def tabla_inventario(desde, hasta, categoria):
     productos = Producto.objects.filter(activo=True)
     if categoria is not None:
         productos = productos.filter(Q(categoria_id=categoria.pk) | Q(categoria__categoria_padre_id=categoria.pk))
-    for p in productos.select_related('categoria').order_by('nombre'):
+    for p in con_tonos(productos).select_related('categoria').order_by('nombre'):
         estado = 'Agotado' if p.stock_actual == 0 else 'Bajo stock' if p.stock_bajo else 'En stock'
         filas.append({'producto': p.nombre, 'sku': p.sku, 'categoria': p.categoria.nombre, 'stock': p.stock_actual,
                       'minimo': p.stock_minimo, 'costo': p.precio_compra, 'valor_costo': p.precio_compra * p.stock_actual,
