@@ -17,9 +17,10 @@ from django.utils import timezone
 
 from app.models import (
     Categoria, Cliente, Compra, DetalleCompra, DetalleDevolucion, DetalleVenta, Devolucion, DireccionCliente,
-    Marca, MetodoPago, MovimientoInventario, MovimientoPuntos, Producto, Proveedor, Resena, Rol, Usuario, Venta,
+    Marca, MetodoPago, MovimientoInventario, MovimientoPuntos, Producto, Proveedor, Resena, Rol, Usuario, VarianteProducto,
+    Venta,
 )
-from app.servicios import ajustar_puntos, registrar_movimiento
+from app.servicios import ajustar_puntos, registrar_movimiento, sincronizar_producto, variante_unica
 
 PROVEEDORES = [
     ('Distribuidora Belleza Total', 'J0310000012345', 'Carlos Mendoza', '+505 2250-1122', 'ventas@bellezatotal.com.ni',
@@ -43,6 +44,14 @@ PRODUCTOS = [
     ('NAP-009', 'Fit Me Base Líquida', 'Rostro', 'Maybelline', 0, 170, 260, 20, 6),
     ('NAP-010', 'Niacinamide 10% + Zinc 1%', 'Serums', 'The Ordinary', 2, 170, 270, 15, 5),
 ]
+
+# Productos con varios tonos, cada uno con su stock: sku -> [(tono, color, stock, mínimo)]
+# (la suma de los tonos es el stock de PRODUCTOS)
+TONOS = {
+    'NAP-001': [('Pioneer', '#9B1B30', 20, 4), ('Lover', '#C2185B', 18, 4), ('Seductress', '#B5656B', 12, 4)],
+    'NAP-009': [('120 Classic Ivory', '#E8C8A8', 9, 2), ('220 Natural Beige', '#D2A57E', 9, 2),
+                ('330 Toffee', '#A86E4A', 2, 3)],
+}
 
 CLIENTES = [
     ('Ana', 'García', 'ana.garcia@email.com', '+505 8888-1234', date(1996, 3, 14)),
@@ -125,15 +134,24 @@ class Command(BaseCommand):
                 descripcion=f'{marca} {nombre}. Producto original importado.',
             )
             productos.append(producto)
-            if stock:
+            if sku in TONOS:
+                entradas = [(VarianteProducto.objects.create(producto=producto, nombre=tono, color_hex=color,
+                                                             stock_minimo=minimo, orden=orden), cantidad)
+                            for orden, (tono, color, cantidad, minimo) in enumerate(TONOS[sku])]
+                sincronizar_producto(producto.pk)
+            else:
+                entradas = [(variante_unica(producto), stock)]
+            for variante, cantidad in entradas:
+                if not cantidad:
+                    continue
                 # El stock inicial entra con una compra recibida al proveedor
                 if prov not in compras:
                     compras[prov] = Compra.objects.create(
                         proveedor=proveedores[prov], usuario=admin, numero_factura=f'FP-{1000 + prov}',
                         fecha=timezone.now() - timedelta(days=15), estado=Compra.Estado.RECIBIDA)
-                DetalleCompra.objects.create(compra=compras[prov], producto=producto, cantidad=stock,
-                                             costo_unitario=Decimal(compra))
-                registrar_movimiento(producto, MovimientoInventario.Tipo.ENTRADA, stock, usuario=admin,
+                DetalleCompra.objects.create(compra=compras[prov], producto=producto, variante=variante,
+                                             cantidad=cantidad, costo_unitario=Decimal(compra))
+                registrar_movimiento(variante, MovimientoInventario.Tipo.ENTRADA, cantidad, usuario=admin,
                                      motivo='Compra inicial', tipo_referencia='Compra',
                                      referencia_id=compras[prov].pk)
         for compra in compras.values():
@@ -173,9 +191,10 @@ class Command(BaseCommand):
                 costo_envio=Decimal(envio), estado=estado, puntos_ganados=puntos,
             )
             for i, cantidad in lineas:
-                DetalleVenta.objects.create(venta=venta, producto=productos[i], cantidad=cantidad,
+                variante = productos[i].variantes.order_by('-stock_actual', 'orden').first()   # el tono con más stock
+                DetalleVenta.objects.create(venta=venta, producto=productos[i], variante=variante, cantidad=cantidad,
                                             precio_unitario=productos[i].precio_venta)
-                registrar_movimiento(productos[i], MovimientoInventario.Tipo.SALIDA, -cantidad, usuario=admin,
+                registrar_movimiento(variante, MovimientoInventario.Tipo.SALIDA, -cantidad, usuario=admin,
                                      motivo=f'Venta {factura}', tipo_referencia='Venta', referencia_id=venta.pk)
             if cliente:
                 ajustar_puntos(cliente, puntos, MovimientoPuntos.Tipo.GANADOS, venta=venta,
