@@ -20,14 +20,14 @@
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-        <p class="text-xs text-gray-500 font-medium">Stock actual</p>
+        <p class="text-xs text-gray-500 font-medium">Stock actual{% if tonos %} <span class="text-gray-400">(todos los tonos)</span>{% endif %}</p>
         <h2 class="text-2xl font-bold {% if producto.stock_actual == 0 %}text-red-600{% elif producto.stock_bajo %}text-yellow-600{% else %}text-gray-800{% endif %}">{{ producto.stock_actual }}</h2>
         <div class="mt-3 h-2 rounded-full bg-gray-100 overflow-hidden" title="Lleno cuando el stock alcanza el mínimo">
             <div class="h-full rounded-full {% if producto.stock_bajo %}bg-yellow-400{% else %}bg-green-400{% endif %}" style="width: {{ producto.stock_actual|porcentaje:producto.stock_minimo }}%"></div>
         </div>
     </div>
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-        <p class="text-xs text-gray-500 font-medium">Stock mínimo</p>
+        <p class="text-xs text-gray-500 font-medium">Stock mínimo{% if tonos %} <span class="text-gray-400">(suma de los tonos)</span>{% endif %}</p>
         <h2 class="text-2xl font-bold text-gray-800">{{ producto.stock_minimo }}</h2>
     </div>
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -39,6 +39,8 @@
         <h2 class="text-2xl font-bold text-red-500">−{{ salidas }}</h2>
     </div>
 </div>
+
+{% include 'componentes/tabla_tonos.html' %}
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <form method="get" class="px-6 py-4 flex flex-wrap justify-between items-center gap-3 border-b border-gray-100">
