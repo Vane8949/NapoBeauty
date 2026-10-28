@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from app.formularios import ProveedorForm
-from app.models import Compra, Producto, Proveedor
+from app.models import Compra, Producto, Proveedor, con_tonos
 
 from .comun import filtrar_estado, guardado, mostrar_formulario, paginar, requiere_permiso, tiene_permiso
 
@@ -67,7 +67,7 @@ def detalle_proveedor(request, pk):
         pendientes=Count('id', filter=Q(estado=Compra.Estado.PENDIENTE)))
     return render(request, 'proveedores/detalle.html', {
         'proveedor': proveedor,
-        'productos': proveedor.productos.select_related('marca', 'categoria').order_by('nombre'),
+        'productos': con_tonos(proveedor.productos.select_related('marca', 'categoria')).order_by('nombre'),
         'compras': proveedor.compras.select_related('usuario').order_by('-fecha')[:10],
         'devoluciones': proveedor.devoluciones.order_by('-fecha', '-id')[:10],
         'resumen': resumen,
