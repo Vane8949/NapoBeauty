@@ -11,7 +11,8 @@ Reglas del negocio que se respetan aquí:
 """
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import F
+from django.db.models import Count, Exists, F, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 
@@ -239,7 +240,76 @@ class Producto(ModeloConActivo):
 
     @property
     def stock_bajo(self):
+        """Algún tono habilitado está en su mínimo o por debajo (sin tonos: el stock del producto)."""
+        if hasattr(self, 'hay_tono_bajo'):          # viene de con_tonos()
+            return self.hay_tono_bajo
+        return self.variantes.filter(activo=True, stock_actual__lte=F('stock_minimo')).exists()
+
+
+class VarianteProducto(ModeloConActivo):
+    """Tono, talla o presentación de un producto, con su propio stock.
+
+    Producto.stock_actual es la suma de sus variantes. Un producto sin tonos tiene una
+    sola variante llamada 'Único'.
+    """
+    UNICA = 'Único'
+
+    id = models.AutoField(primary_key=True, db_column='VarianteProductoId')
+    producto = models.ForeignKey(Producto, models.PROTECT, db_column='ProductoId', related_name='variantes')
+    nombre = models.CharField(max_length=80, db_column='Nombre')
+    color_hex = models.CharField(max_length=7, null=True, blank=True, db_column='ColorHex')
+    sku = models.CharField(max_length=40, null=True, blank=True, db_column='SKU')
+    imagen = models.ImageField(upload_to='productos/tonos/', max_length=255, null=True, blank=True, db_column='Imagen')
+    stock_actual = models.IntegerField(default=0, validators=[MinValueValidator(0)], db_column='StockActual')
+    stock_minimo = models.IntegerField(default=5, validators=[MinValueValidator(0)], db_column='StockMinimo')
+    orden = models.IntegerField(default=0, db_column='Orden')
+    fecha_creacion = models.DateTimeField(default=timezone.now, db_column='FechaCreacion')
+
+    class Meta:
+        managed = False
+        db_table = 'VarianteProducto'
+        verbose_name = 'variante de producto'
+        verbose_name_plural = 'variantes de productos'
+        ordering = ['orden', 'id']
+
+    def __str__(self):
+        return self.producto.nombre if self.es_unica else f'{self.producto.nombre} · {self.nombre}'
+
+    @property
+    def es_unica(self):
+        return self.nombre == self.UNICA
+
+    @property
+    def stock_bajo(self):
         return self.stock_actual <= self.stock_minimo
+
+
+def con_tonos(productos):
+    """Agrega a cada producto hay_tono_bajo (algún tono habilitado en o bajo su mínimo) y num_tonos.
+
+    Son subconsultas (no JOIN + GROUP BY) para poder combinarlas con otras anotaciones en SQL Server.
+    """
+    tonos = VarianteProducto.objects.filter(producto=OuterRef('pk'), activo=True)
+    conteo = (tonos.exclude(nombre=VarianteProducto.UNICA).order_by().values('producto')
+              .annotate(n=Count('pk')).values('n')[:1])
+    return productos.annotate(hay_tono_bajo=Exists(tonos.filter(stock_actual__lte=F('stock_minimo'))),
+                              num_tonos=Coalesce(Subquery(conteo), Value(0)))
+
+
+class ConVariante:
+    """Renglones que llevan producto y tono (ventas, compras, movimientos, devoluciones a proveedor)."""
+
+    @property
+    def tono(self):
+        """Nombre del tono, o None si el producto no tiene tonos."""
+        if self.variante_id and not self.variante.es_unica:
+            return self.variante.nombre
+        return None
+
+    @property
+    def articulo(self):
+        """Producto con su tono, ej. 'Labial Matte · Rojo'."""
+        return f'{self.producto.nombre} · {self.tono}' if self.tono else self.producto.nombre
 
 
 class ProductoImagen(ModeloConActivo):
@@ -281,10 +351,12 @@ class Compra(ModeloConActivo):
         verbose_name = 'compra'
 
 
-class DetalleCompra(ModeloNapo):
+class DetalleCompra(ConVariante, ModeloNapo):
     id = models.AutoField(primary_key=True, db_column='DetalleCompraId')
     compra = models.ForeignKey(Compra, models.PROTECT, db_column='CompraId', related_name='detalles')
     producto = models.ForeignKey(Producto, models.PROTECT, db_column='ProductoId', related_name='detalles_compra')
+    variante = models.ForeignKey(VarianteProducto, models.PROTECT, null=True, blank=True, db_column='VarianteId',
+                                 related_name='detalles_compra')
     cantidad = models.IntegerField(validators=[MinValueValidator(1)], db_column='Cantidad')
     costo_unitario = dinero(validators=[MinValueValidator(0)], db_column='CostoUnitario')
     # Columna calculada en SQL Server: no se escribe, solo se lee
@@ -300,7 +372,7 @@ class DetalleCompra(ModeloNapo):
         verbose_name = 'detalle de compra'
 
 
-class MovimientoInventario(ModeloNapo):
+class MovimientoInventario(ConVariante, ModeloNapo):
     """Historial inmutable de cambios de stock."""
 
     class Tipo(models.TextChoices):
@@ -311,11 +383,13 @@ class MovimientoInventario(ModeloNapo):
 
     id = models.AutoField(primary_key=True, db_column='MovimientoInventarioId')
     producto = models.ForeignKey(Producto, models.PROTECT, db_column='ProductoId', related_name='movimientos')
+    variante = models.ForeignKey(VarianteProducto, models.PROTECT, null=True, blank=True, db_column='VarianteId',
+                                 related_name='movimientos')
     usuario = models.ForeignKey(Usuario, models.PROTECT, null=True, blank=True, db_column='UsuarioId',
                                 related_name='movimientos_inventario')
     tipo = models.CharField(max_length=20, choices=Tipo.choices, db_column='Tipo')
     cantidad = models.IntegerField(db_column='Cantidad')            # positiva entra, negativa sale
-    stock_anterior = models.IntegerField(db_column='StockAnterior')
+    stock_anterior = models.IntegerField(db_column='StockAnterior')  # stock de la variante
     stock_nuevo = models.IntegerField(db_column='StockNuevo')
     motivo = models.CharField(max_length=200, null=True, blank=True, db_column='Motivo')
     tipo_referencia = models.CharField(max_length=20, null=True, blank=True, db_column='TipoReferencia')
@@ -527,10 +601,12 @@ class Venta(ModeloConActivo):
         return self.numero_factura
 
 
-class DetalleVenta(ModeloNapo):
+class DetalleVenta(ConVariante, ModeloNapo):
     id = models.AutoField(primary_key=True, db_column='DetalleVentaId')
     venta = models.ForeignKey(Venta, models.PROTECT, db_column='VentaId', related_name='detalles')
     producto = models.ForeignKey(Producto, models.PROTECT, db_column='ProductoId', related_name='detalles_venta')
+    variante = models.ForeignKey(VarianteProducto, models.PROTECT, null=True, blank=True, db_column='VarianteId',
+                                 related_name='detalles_venta')
     cantidad = models.IntegerField(validators=[MinValueValidator(1)], db_column='Cantidad')
     precio_unitario = dinero(validators=[MinValueValidator(0)], db_column='PrecioUnitario')
     descuento = dinero(default=0, validators=[MinValueValidator(0)], db_column='Descuento')
@@ -671,11 +747,13 @@ class DevolucionProveedor(ModeloConActivo):
         return self.estado in (self.Estado.COMPLETADA, self.Estado.RECHAZADA)
 
 
-class DetalleDevolucionProveedor(ModeloNapo):
+class DetalleDevolucionProveedor(ConVariante, ModeloNapo):
     id = models.AutoField(primary_key=True, db_column='DetalleDevolucionProveedorId')
     devolucion_proveedor = models.ForeignKey(DevolucionProveedor, models.PROTECT, db_column='DevolucionProveedorId',
                                              related_name='detalles')
     producto = models.ForeignKey(Producto, models.PROTECT, db_column='ProductoId',
+                                 related_name='devoluciones_proveedor')
+    variante = models.ForeignKey(VarianteProducto, models.PROTECT, null=True, blank=True, db_column='VarianteId',
                                  related_name='devoluciones_proveedor')
     cantidad = models.IntegerField(validators=[MinValueValidator(1)], db_column='Cantidad')
     costo_unitario = dinero(validators=[MinValueValidator(0)], db_column='CostoUnitario')
