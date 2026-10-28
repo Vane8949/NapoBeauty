@@ -1,0 +1,45 @@
+{% comment %}Tonos de un producto con su stock. Variables: tonos (lista de VarianteProducto), producto, puede_ajustar (opcional){% endcomment %}
+{% if tonos %}
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <div class="px-6 py-4 flex justify-between items-center border-b border-gray-100">
+        <h2 class="font-bold text-gray-800">Tonos <span class="text-gray-400 font-medium text-sm">· cada uno con su propio stock</span></h2>
+        <span class="text-xs text-gray-500">{{ tonos|length }} tono{{ tonos|length|pluralize }}</span>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+        <thead class="bg-pink-50/50 text-gray-600 font-medium border-b border-pink-100">
+            <tr>
+                <th class="py-3 px-6">Tono</th>
+                <th class="py-3 px-6">SKU</th>
+                <th class="py-3 px-6 text-center">Stock</th>
+                <th class="py-3 px-6 text-center">Mínimo</th>
+                <th class="py-3 px-6 text-center">Estado</th>
+                {% if puede_ajustar %}<th class="py-3 px-6 text-center">Ajustar</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody class="text-gray-700">
+            {% for v in tonos %}
+            <tr class="border-b border-gray-50 last:border-0 {% if not v.activo %}opacity-60{% endif %}">
+                <td class="py-3 px-6">
+                    <span class="inline-flex items-center gap-3 font-medium text-gray-800">
+                        {% if v.imagen %}<a href="{{ v.imagen.url }}" target="_blank" rel="noopener" class="relative shrink-0" title="Ver foto de {{ v.nombre }}"><img src="{{ v.imagen.url }}" alt="{{ v.nombre }}" class="w-10 h-10 rounded-lg object-cover border border-gray-100"></a>
+                        {% else %}<span class="w-10 h-10 rounded-lg bg-pink-50 text-pink-300 flex items-center justify-center shrink-0"><i class="fa-solid fa-image"></i></span>{% endif %}{{ v.nombre }}
+                    </span>
+                </td>
+                <td class="py-3 px-6 text-gray-500">{{ v.sku|default:'—' }}</td>
+                <td class="py-3 px-6 text-center font-bold {% if v.stock_actual == 0 %}text-red-600{% elif v.stock_bajo %}text-yellow-600{% else %}text-gray-800{% endif %}">{{ v.stock_actual }}</td>
+                <td class="py-3 px-6 text-center text-gray-500">{{ v.stock_minimo }}</td>
+                <td class="py-3 px-6 text-center">
+                    {% if not v.activo %}<span class="bg-gray-100 text-gray-500 text-[11px] px-3 py-1 rounded-full font-bold">Deshabilitado</span>
+                    {% elif v.stock_actual == 0 %}<span class="bg-red-100 text-red-600 text-[11px] px-3 py-1 rounded-full font-bold">Agotado</span>
+                    {% elif v.stock_bajo %}<span class="bg-yellow-100 text-yellow-700 text-[11px] px-3 py-1 rounded-full font-bold">Bajo stock</span>
+                    {% else %}<span class="bg-green-100 text-green-600 text-[11px] px-3 py-1 rounded-full font-bold">En stock</span>{% endif %}
+                </td>
+                {% if puede_ajustar %}<td class="py-3 px-6 text-center">{% if v.activo %}<a href="{% url 'inventario_ajustar' producto.pk %}?variante={{ v.pk }}" data-modal class="w-8 h-8 inline-flex items-center justify-center rounded-lg text-pink-500 hover:bg-pink-50" title="Ajustar stock de {{ v.nombre }}" aria-label="Ajustar stock de {{ v.nombre }}"><i class="fa-solid fa-sliders"></i></a>{% endif %}</td>{% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endif %}
