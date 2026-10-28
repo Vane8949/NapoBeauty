@@ -16,7 +16,7 @@
             {% for linea in form.lineas %}
             <div class="grid grid-cols-[1fr_5.5rem_13rem] gap-3 px-3 py-3 items-center {% if linea.disponible <= 0 %}opacity-50{% endif %}">
                 <div>
-                    <p class="text-sm font-medium text-gray-800">{{ linea.detalle.producto.nombre }}</p>
+                    <p class="text-sm font-medium text-gray-800">{{ linea.detalle.articulo }}</p>
                     <p class="text-xs text-gray-400">Vendidos: {{ linea.detalle.cantidad }} · {{ linea.detalle.precio_unitario|cordobas }} c/u{% if linea.devueltos %} · ya devueltos: {{ linea.devueltos }}{% endif %}</p>
                     {% for error in linea.cantidad.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
                 </div>
