@@ -58,7 +58,7 @@ def detalle_venta(request, pk):
         Venta.objects.select_related('cliente', 'usuario', 'metodo_pago', 'direccion_cliente'), pk=pk)
     return render(request, 'ventas/detalle.html', {
         'venta': venta,
-        'detalles': venta.detalles.select_related('producto__marca'),
+        'detalles': venta.detalles.select_related('producto__marca', 'variante'),
         'devoluciones': venta.devoluciones.all(),
         'puede_editar': tiene_permiso(request, 'ventas.editar'),
         'puede_devolver': venta.activo and tiene_permiso(request, 'devoluciones.crear'),
@@ -69,7 +69,7 @@ def detalle_venta(request, pk):
 def crear_venta(request):
     """Registrar venta de mostrador: varias líneas de productos, total en pantalla.
 
-    El cliente puede ser de mostrador, uno registrado o uno nuevo, que se registra junto con la venta.
+    Toda venta lleva cliente: uno registrado o uno nuevo, que se registra junto con la venta.
     Al guardar se abre el recibo para imprimirlo.
     """
     form = VentaNuevaForm(request.POST or None)
@@ -108,7 +108,7 @@ def recibo_venta(request, pk):
     venta = get_object_or_404(Venta.objects.select_related('cliente', 'usuario', 'metodo_pago'), pk=pk)
     return render(request, 'ventas/recibo.html', {
         'venta': venta,
-        'detalles': venta.detalles.select_related('producto__marca').order_by('id'),
+        'detalles': venta.detalles.select_related('producto__marca', 'variante').order_by('id'),
         'tienda': getattr(settings, 'NAPO_TIENDA', {'nombre': 'Napo Beauty'}),
         'nueva': request.GET.get('nueva') == '1',
         'unidades': sum(d.cantidad for d in venta.detalles.all()),
