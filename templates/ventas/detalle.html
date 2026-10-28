@@ -38,7 +38,7 @@
                 <tbody>
                     {% for d in detalles %}
                     <tr class="border-b border-gray-50">
-                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.producto.nombre }}</a><p class="text-xs text-gray-400">{{ d.producto.marca.nombre }} · {{ d.producto.sku }}</p></td>
+                        <td class="py-3 px-6"><a href="{% url 'producto_detalle' d.producto_id %}" class="font-medium text-gray-800 hover:text-pink-600">{{ d.producto.nombre }}</a> {% include 'componentes/tono.html' with v=d.variante %}<p class="text-xs text-gray-400">{{ d.producto.marca.nombre }} · {{ d.producto.sku }}</p></td>
                         <td class="py-3 px-6 text-center">{{ d.cantidad }}</td>
                         <td class="py-3 px-6 text-right whitespace-nowrap">{{ d.precio_unitario|cordobas }}</td>
                         <td class="py-3 px-6 text-right whitespace-nowrap text-gray-500">{% if d.descuento %}−{{ d.descuento|cordobas }}{% else %}—{% endif %}</td>
