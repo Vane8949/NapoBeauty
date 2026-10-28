@@ -1,8 +1,8 @@
 {# Una línea de producto de "Registrar venta". Variable: linea (formulario del formset) #}
 <div data-linea class="{% if linea.DELETE.value %}hidden {% endif %}grid grid-cols-[1fr_6rem] sm:grid-cols-[1fr_6rem_7rem_2.5rem] gap-3 px-3 py-3 items-start">
     <div>
-        {{ linea.producto }}
-        {% for error in linea.producto.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        {{ linea.variante }}
+        {% for error in linea.variante.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
         <p data-aviso-stock class="hidden text-xs text-red-600 mt-1"></p>
     </div>
     <div>
