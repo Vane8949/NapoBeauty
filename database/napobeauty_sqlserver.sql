@@ -167,6 +167,30 @@ CREATE TABLE dbo.ProductoImagen (
     CONSTRAINT PK_ProductoImagen PRIMARY KEY (ProductoImagenId),
     CONSTRAINT FK_ProductoImagen_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId)
 );
+
+-- Variantes de un producto (tono, talla o presentación), cada una con su propio stock.
+-- Producto.StockActual es la suma de sus variantes; un producto sin variantes tiene una llamada 'Único'.
+CREATE TABLE dbo.VarianteProducto (
+    VarianteProductoId INT IDENTITY(1,1) NOT NULL,
+    ProductoId       INT               NOT NULL,
+    Nombre           NVARCHAR(80)      NOT NULL,          -- tono, talla o presentación; 'Único' si no tiene
+    ColorHex         NVARCHAR(7)       NULL,              -- muestra del tono, ej. #C2185B
+    SKU              NVARCHAR(40)      NULL,              -- código propio del tono (opcional)
+    Imagen           NVARCHAR(255)     NULL,              -- foto del tono, ruta dentro de media/
+    StockActual      INT               NOT NULL CONSTRAINT DF_VarianteProducto_Stock DEFAULT (0),
+    StockMinimo      INT               NOT NULL CONSTRAINT DF_VarianteProducto_StockMinimo DEFAULT (5),
+    Orden            INT               NOT NULL CONSTRAINT DF_VarianteProducto_Orden DEFAULT (0),
+    FechaCreacion    DATETIME2(0)      NOT NULL CONSTRAINT DF_VarianteProducto_Fecha DEFAULT (SYSDATETIME()),
+    Activo           BIT               NOT NULL CONSTRAINT DF_VarianteProducto_Activo DEFAULT (1),
+    CONSTRAINT PK_VarianteProducto PRIMARY KEY (VarianteProductoId),
+    CONSTRAINT FK_VarianteProducto_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId),
+    CONSTRAINT UQ_VarianteProducto_Nombre UNIQUE (ProductoId, Nombre),
+    CONSTRAINT CK_VarianteProducto_Stock CHECK (StockActual >= 0),
+    CONSTRAINT CK_VarianteProducto_StockMinimo CHECK (StockMinimo >= 0),
+    CONSTRAINT CK_VarianteProducto_Color CHECK (ColorHex IS NULL OR ColorHex LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]')
+);
+CREATE INDEX IX_VarianteProducto_ProductoId ON dbo.VarianteProducto (ProductoId);
+CREATE UNIQUE INDEX UX_VarianteProducto_SKU ON dbo.VarianteProducto (SKU) WHERE SKU IS NOT NULL;
 -- Solo una imagen principal por producto
 CREATE UNIQUE INDEX UX_ProductoImagen_Principal ON dbo.ProductoImagen (ProductoId) WHERE EsPrincipal = 1 AND Activo = 1;
 
@@ -196,10 +220,12 @@ CREATE TABLE dbo.DetalleCompra (
     DetalleCompraId INT IDENTITY(1,1)  NOT NULL,
     CompraId        INT                NOT NULL,
     ProductoId      INT                NOT NULL,
+    VarianteId      INT                NULL,              -- tono que entró
     Cantidad        INT                NOT NULL,
     CostoUnitario   DECIMAL(10,2)      NOT NULL,
     Subtotal        AS (Cantidad * CostoUnitario) PERSISTED,
     CONSTRAINT PK_DetalleCompra PRIMARY KEY (DetalleCompraId),
+    CONSTRAINT FK_DetalleCompra_Variante FOREIGN KEY (VarianteId) REFERENCES dbo.VarianteProducto (VarianteProductoId),
     CONSTRAINT FK_DetalleCompra_Compra FOREIGN KEY (CompraId) REFERENCES dbo.Compra (CompraId),
     CONSTRAINT FK_DetalleCompra_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId),
     CONSTRAINT CK_DetalleCompra_Cantidad CHECK (Cantidad > 0),
@@ -212,10 +238,11 @@ CREATE INDEX IX_DetalleCompra_ProductoId ON dbo.DetalleCompra (ProductoId);
 CREATE TABLE dbo.MovimientoInventario (
     MovimientoInventarioId INT IDENTITY(1,1) NOT NULL,
     ProductoId      INT                NOT NULL,
+    VarianteId      INT                NULL,              -- tono cuyo stock cambió
     UsuarioId       INT                NULL,              -- NULL si lo generó una compra en línea
     Tipo            NVARCHAR(20)       NOT NULL,
     Cantidad        INT                NOT NULL,          -- positiva entra, negativa sale
-    StockAnterior   INT                NOT NULL,
+    StockAnterior   INT                NOT NULL,          -- stock de la variante antes y después
     StockNuevo      INT                NOT NULL,
     Motivo          NVARCHAR(200)      NULL,
     TipoReferencia  NVARCHAR(20)       NULL,              -- 'Venta', 'Compra', 'Devolucion', 'DevProveedor'
@@ -223,12 +250,14 @@ CREATE TABLE dbo.MovimientoInventario (
     Fecha           DATETIME2(0)       NOT NULL CONSTRAINT DF_MovimientoInventario_Fecha DEFAULT (SYSDATETIME()),
     CONSTRAINT PK_MovimientoInventario PRIMARY KEY (MovimientoInventarioId),
     CONSTRAINT FK_MovimientoInventario_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId),
+    CONSTRAINT FK_MovimientoInventario_Variante FOREIGN KEY (VarianteId) REFERENCES dbo.VarianteProducto (VarianteProductoId),
     CONSTRAINT FK_MovimientoInventario_Usuario FOREIGN KEY (UsuarioId) REFERENCES dbo.Usuario (UsuarioId),
     CONSTRAINT CK_MovimientoInventario_Tipo CHECK (Tipo IN (N'Entrada', N'Salida', N'Ajuste', N'Devolucion')),
     CONSTRAINT CK_MovimientoInventario_Cantidad CHECK (Cantidad <> 0),
     CONSTRAINT CK_MovimientoInventario_Stock CHECK (StockNuevo >= 0 AND StockNuevo = StockAnterior + Cantidad)
 );
 CREATE INDEX IX_MovimientoInventario_Producto_Fecha ON dbo.MovimientoInventario (ProductoId, Fecha);
+CREATE INDEX IX_MovimientoInventario_VarianteId ON dbo.MovimientoInventario (VarianteId, Fecha DESC);
 
 
 /* =============================================================================
@@ -392,18 +421,21 @@ CREATE TABLE dbo.DetalleVenta (
     DetalleVentaId   INT IDENTITY(1,1) NOT NULL,
     VentaId          INT               NOT NULL,
     ProductoId       INT               NOT NULL,
+    VarianteId       INT               NULL,              -- tono vendido
     Cantidad         INT               NOT NULL,
     PrecioUnitario   DECIMAL(10,2)     NOT NULL,          -- precio al momento de la venta
     Descuento        DECIMAL(10,2)     NOT NULL CONSTRAINT DF_DetalleVenta_Descuento DEFAULT (0),
     Subtotal         AS (Cantidad * PrecioUnitario - Descuento) PERSISTED,
     CONSTRAINT PK_DetalleVenta PRIMARY KEY (DetalleVentaId),
-    CONSTRAINT UQ_DetalleVenta_Venta_Producto UNIQUE (VentaId, ProductoId),
+    CONSTRAINT FK_DetalleVenta_Variante FOREIGN KEY (VarianteId) REFERENCES dbo.VarianteProducto (VarianteProductoId),
     CONSTRAINT FK_DetalleVenta_Venta FOREIGN KEY (VentaId) REFERENCES dbo.Venta (VentaId),
     CONSTRAINT FK_DetalleVenta_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId),
     CONSTRAINT CK_DetalleVenta_Cantidad CHECK (Cantidad > 0),
     CONSTRAINT CK_DetalleVenta_Montos CHECK (PrecioUnitario >= 0 AND Descuento >= 0 AND Descuento <= Cantidad * PrecioUnitario)
 );
 CREATE INDEX IX_DetalleVenta_ProductoId ON dbo.DetalleVenta (ProductoId);
+CREATE INDEX IX_DetalleVenta_VarianteId ON dbo.DetalleVenta (VarianteId);
+CREATE UNIQUE INDEX UX_DetalleVenta_Venta_Variante ON dbo.DetalleVenta (VentaId, VarianteId) WHERE VarianteId IS NOT NULL;
 
 
 /* =============================================================================
@@ -483,17 +515,19 @@ CREATE TABLE dbo.DetalleDevolucionProveedor (
     DetalleDevolucionProveedorId INT IDENTITY(1,1) NOT NULL,
     DevolucionProveedorId INT          NOT NULL,
     ProductoId       INT               NOT NULL,
+    VarianteId       INT               NULL,              -- tono devuelto
     Cantidad         INT               NOT NULL,
     CostoUnitario    DECIMAL(10,2)     NOT NULL,          -- precio de compra al momento de devolver
     Subtotal         AS (Cantidad * CostoUnitario) PERSISTED,
     CONSTRAINT PK_DetalleDevolucionProveedor PRIMARY KEY (DetalleDevolucionProveedorId),
-    CONSTRAINT UQ_DetalleDevolucionProveedor UNIQUE (DevolucionProveedorId, ProductoId),
+    CONSTRAINT FK_DetalleDevolucionProveedor_Variante FOREIGN KEY (VarianteId) REFERENCES dbo.VarianteProducto (VarianteProductoId),
     CONSTRAINT FK_DetalleDevolucionProveedor_Devolucion FOREIGN KEY (DevolucionProveedorId) REFERENCES dbo.DevolucionProveedor (DevolucionProveedorId),
     CONSTRAINT FK_DetalleDevolucionProveedor_Producto FOREIGN KEY (ProductoId) REFERENCES dbo.Producto (ProductoId),
     CONSTRAINT CK_DetalleDevolucionProveedor_Cantidad CHECK (Cantidad > 0),
     CONSTRAINT CK_DetalleDevolucionProveedor_Costo CHECK (CostoUnitario >= 0)
 );
 CREATE INDEX IX_DetalleDevolucionProveedor_ProductoId ON dbo.DetalleDevolucionProveedor (ProductoId);
+CREATE UNIQUE INDEX UX_DetalleDevolucionProveedor_Variante ON dbo.DetalleDevolucionProveedor (DevolucionProveedorId, VarianteId) WHERE VarianteId IS NOT NULL;
 
 
 /* =============================================================================
@@ -658,6 +692,13 @@ CREATE TRIGGER dbo.TR_Producto_NoBorrar ON dbo.Producto INSTEAD OF DELETE AS
 BEGIN
     SET NOCOUNT ON;
     THROW 50001, N'No se permite borrar en Producto. Deshabilite el registro con Activo = 0.', 1;
+END;
+GO
+
+CREATE TRIGGER dbo.TR_VarianteProducto_NoBorrar ON dbo.VarianteProducto INSTEAD OF DELETE AS
+BEGIN
+    SET NOCOUNT ON;
+    THROW 50001, N'No se permite borrar en VarianteProducto. Deshabilite el registro con Activo = 0.', 1;
 END;
 GO
 
